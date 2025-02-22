@@ -1,0 +1,174 @@
+.main {
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    flex-direction: column;
+    position: relative;
+}
+
+.suiPay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    margin-bottom: 2em;
+}
+
+.suiDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: absolute;
+    top: 35%;
+
+}
+
+.suiPay img {
+    width: 100%;
+    height: 100%;
+}
+
+.suiPay h1 {
+    color: white;
+    font-weight: 500;
+    font-size: 52.91px;
+}
+
+.main a {
+    color: white;
+    text-decoration: none;
+    background-color: #79bcdb;
+    border-radius: 0.5em;
+    padding: 1em 4em;
+}
+
+.gradinetImg {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    bottom: 2em;
+}
+
+.gradinetImg p {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16.8415px;
+    line-height: 20px;
+    color: #FFFFFF;
+}
+
+.gradinetImg img {
+    width: 440px;
+    height: 7.78px;
+}
+
+.sign_in {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes complexMotion {
+    0% {
+        background-position: 0% 50%;
+        transform: scale(1) rotate(0deg);
+        filter: blur(2px) brightness(1);
+        opacity: 0.6;
+    }
+
+    20% {
+        background-position: 30% 40%;
+        transform: scale(1.05) rotate(2deg);
+        filter: blur(3px) brightness(1.1);
+        opacity: 0.89;
+    }
+
+    40% {
+        background-position: 70% 60%;
+        transform: scale(1) rotate(-2deg);
+        filter: blur(5px) brightness(1.2);
+        opacity: 0.75;
+    }
+
+    60% {
+        background-position: 50% 20%;
+        transform: scale(1.03) rotate(1deg);
+        filter: blur(4px) brightness(1.1);
+        opacity: 0.79;
+    }
+
+    80% {
+        background-position: 20% 70%;
+        transform: scale(1) rotate(-1deg);
+        filter: blur(3px) brightness(1);
+        opacity: 0.85;
+    }
+
+    100% {
+        background-position: 0% 50%;
+        transform: scale(1) rotate(0deg);
+        filter: blur(2px) brightness(1);
+        opacity: 0.1;
+    }
+}
+
+.sign_in {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.sign_in::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/sui.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(2px) brightness(1);
+    animation: complexMotion 15s infinite ease-in-out alternate;
+    z-index: -1;
+}
+
+
+.sign_in img {
+    width: 100vh;
+    height: 100vh;
+    object-fit: cover;
+}
+
+.sign_in_img {}
+
+.sign_in_div {}
+
+.sign_in_div button {
+    background: linear-gradient(135deg, #001b27, #003048);
+    border-radius: 0.5em;
+    padding: 1em 2.5em;
+    border-color: transparent;
+    box-shadow: none;
+    color: white;
+    font-size: 1em;
+    display: flex;
+}
+
+.sign_in_div img {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5em;
+}
