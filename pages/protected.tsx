@@ -12,7 +12,15 @@ export default withZkLoginSessionRequired(({ session }) => {
   const { mutateAsync: add, isPending: isAdding } = useAddMutation();
   const { data: txs, isLoading: isLoadingTxs } = useRecentTxsQuery();
 
-  if (isLoading) return <p>Loading zkLogin session...</p>;
+  if (isLoading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full border-t-2 border-b-2 border-white h-16 w-16 mb-4"></div>
+          <p className="text-lg font-medium">Loading zkLogin session...</p>
+        </div>
+      </div>
+    );
 
   return (
     <>
