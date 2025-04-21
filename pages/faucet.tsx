@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { getFaucetHost, requestSuiFromFaucetV0 } from "@mysten/sui/faucet";
-import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import toast from "react-hot-toast";
 
 export default function FaucetPage() {
-  const { user, isLoading } = useZkLoginSession();
-  const walletAddress = user?.wallet ?? "";
+  const account = useCurrentAccount();
+  const suiClient = useSuiClient();
+  const walletAddress = account?.address ?? "";
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -40,7 +41,7 @@ export default function FaucetPage() {
           🧪 Sui Faucet (Testnet)
         </h1>
 
-        {isLoading ? (
+        {!account?.address ? (
           <p className="text-center text-gray-400">Loading wallet...</p>
         ) : !walletAddress ? (
           <p className="text-center text-red-400">No connected wallet found.</p>

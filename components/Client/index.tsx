@@ -13,13 +13,23 @@ import {
   ModalFooter,
   ModalHeader,
 } from "flowbite-react";
-import { makePayment } from "@/utils/paymentUtils";
+import { Transaction } from "@mysten/sui/transactions";
+import { PaymentClient } from "../../payment/src/payment-client";
+import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
+import {
+  useSignAndExecuteTransaction,
+  useCurrentAccount,
+} from "@mysten/dapp-kit";
 
 export default function ClientPage() {
   const [openModal, setOpenModal] = useState(false);
   const [tip, setTip] = useState("0");
   const [paymentId, setPaymentId] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+
+  const account = useCurrentAccount();
+  const { mutateAsync: signAndExecuteTransaction } =
+    useSignAndExecuteTransaction();
 
   const handlePayment = async () => {
     console.log("📝 Payment attempt initiated");
@@ -31,12 +41,46 @@ export default function ClientPage() {
       return;
     }
 
+    if (!account) {
+      setStatus("❌ No wallet connected.");
+      return;
+    }
+
     try {
       setStatus("⏳ Processing payment...");
-      const data = await makePayment(paymentId, BigInt(tip));
-      console.log("✅ Payment Success:", data);
 
-      setStatus(`✅ Paid ${data.paidAmount} with Tip ${data.tipAmount}`);
+      const paymentClient = await PaymentClient.init(
+        NETWORK,
+        "0x21aa14a1466461b3096ca43420f38d8c6002e01684dcb9f28feb0eb5c99912ae",
+        "0x21aa14a1466461b3096ca43420f38d8c6002e01684dcb9f28feb0eb5c99912ae"
+      );
+
+      const tx = new Transaction();
+      
+      tx.setSender(account.address);
+      // Optional: let the wallet set gas
+      await paymentClient.makePayment(tx, paymentId, BigInt(tip));
+
+      const result = await signAndExecuteTransaction({
+        transaction: tx,
+        chain: "sui:testnet", // or "sui:mainnet"
+        options: {
+          showEffects: true,
+          showEvents: true,
+        },
+        // requestType: "WaitForLocalExecution",
+      });
+
+      const status = result.effects?.status.status;
+      if (status !== "success") {
+        console.error(result.effects?.status.error);
+        setStatus("❌ Payment failed.");
+        return;
+      }
+
+      const data = result.events?.[0]?.parsedJson as any;
+      console.log("✅ Payment Success:", data);
+      setStatus(`✅ Paid ${data.amount} with Tip ${data.tip}`);
     } catch (err) {
       console.error("❌ Payment Error:", err);
       setStatus("❌ Payment failed.");

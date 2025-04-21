@@ -11,6 +11,7 @@ import { getZkLoginWalletAddress } from "@/utils/getZkLoginAddress";
 import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { useRouter } from "next/router";
+import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
 
 interface PaymentAccount {
   id: string;
@@ -19,8 +20,13 @@ interface PaymentAccount {
 
 export default function Index() {
   const router = useRouter();
+  const account = useCurrentAccount();
 
-  const { user, isLoading } = useZkLoginSession();
+  const user = account?.address;
+
+  const isLoading = !account?.address;
+
+  // const { user, isLoading } = useZkLoginSession();
   const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
@@ -39,10 +45,7 @@ export default function Index() {
     setLoading(true);
 
     try {
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        "0x29798d2f9bea9f6f5950410ee0fa940635920f84e5f2035e6046d55bcc58aee6"
-      );
+      const paymentClient = await PaymentClient.init(NETWORK, user);
       const userProfileData = paymentClient.getUserProfile();
       setUserProfile(userProfileData);
 
@@ -142,19 +145,19 @@ export default function Index() {
     }
   };
 
-  if (isLoading) return <p>Loading zkLogin session...</p>;
+  if (!user) return <p>Loading... Please Connect Your Wallet.</p>;
 
   console.log("accounts", accounts);
 
   if (user) {
     return (
       <div className="container mx-auto max-w-screen-xl">
-        <h1>
+        {/* <h1>
           Hello,{" "}
-          {user?.wallet
+          {user
             ? `${user.wallet.slice(0, 6)}...${user.wallet.slice(-6)}`
             : "Not logged in"}
-        </h1>
+        </h1> */}
 
         {message && (
           <div className="mb-4 p-3 text-white rounded">

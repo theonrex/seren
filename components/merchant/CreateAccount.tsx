@@ -13,19 +13,33 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { NETWORK } from "../../payment/test/ptbs/utils";
+import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 export default function MerchantSlug() {
-  const { user, isLoading } = useZkLoginSession();
+  const account = useCurrentAccount();
+
+  const user = account?.address;
   const [balance, setBalance] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [coinType, setCoinType] = useState("0x2::sui::SUI");
   const [amount, setAmount] = useState("0");
   const [generatedPayId, setGeneratedPayId] = useState("");
+  // const isLoading = !account?.address;
 
+  const [shopName, setShopName] = useState("");
+  const [username, setUsername] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+  const [digest, setDigest] = useState("");
+  const currentAccount = useCurrentAccount();
   // Get the user address from ZkLogin session or fallback to accountDetails
-  const userAddress = user?.userAddr || accountDetails;
-
+  const userAddress = user;
+  console.log("NETWORK", NETWORK);
   useEffect(() => {
     if (!userAddress) return;
     getSuiBalance(userAddress).then(setBalance).catch(console.error);
@@ -35,56 +49,50 @@ export default function MerchantSlug() {
     setIsModalOpen(true);
   };
 
-  const handleGeneratePayId = async () => {
-    if (!user) {
-      alert("Please connect your wallet with zkLogin first");
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage("");
+    setError("");
 
     try {
       const tx = new Transaction();
-      tx.setGasBudget(1000000000);
+      const paymentClient = await PaymentClient.init(NETWORK, user);
 
-      // Initialize payment client with the user's address
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        userAddress,
-        userAddress // Using user's address instead of hardcoded ACCOUNT
-      );
-
-      // Issue the payment
-      paymentClient.issuePayment(tx, description, coinType, BigInt(amount));
-
-      // Set the sender to the user's address
-      tx.setSender(userAddress);
-
-      // Use the zkLogin session to sign and execute the transaction
-      // This assumes the Shinami zkLogin SDK provides a way to sign and execute transactions
-      const result = await user.signAndExecuteTransactionBlock({
-        transactionBlock: tx,
-        options: {
-          showEffects: true,
-          showEvents: true,
-        },
-        requestType: "WaitForLocalExecution",
+      paymentClient.createPaymentAccount(tx, shopName, {
+        username: username,
+        profilePicture: profilePicture,
       });
 
-      if (result.effects?.status.status !== "success") {
-        console.error("Failed issuing payment:", result.effects?.status.error);
-        alert("Payment creation failed.");
-        return;
-      }
-
-      // Extract payment ID from the results
-      const payId = result.events?.[0]?.parsedJson?.payment_id;
-      const link = `${window.location.origin}/pay/${payId}`;
-      setGeneratedPayId(link);
-    } catch (err) {
-      console.error("❌ Error:", err);
-      alert(
-        "Error generating Pay ID: " +
-          (err instanceof Error ? err.message : String(err))
+      signAndExecuteTransaction(
+        {
+          transaction: tx,
+          chain: "sui:testnet",
+        },
+        {
+          onSuccess: (result) => {
+            console.log("object changes", result.objectChanges);
+            setDigest(result.digest);
+            setMessage("Payment account created successfully");
+            setShopName("");
+            setUsername("");
+            setProfilePicture("");
+          },
+          onError: (err) => {
+            setError(err instanceof Error ? err.message : "Transaction failed");
+            console.error(err);
+          },
+          onSettled: () => {
+            setIsLoading(false);
+          },
+        }
       );
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to create payment account"
+      );
+      console.error(err);
+      setIsLoading(false); // In case the try block fails before `signAndExecuteTransaction`
     }
   };
 
@@ -96,7 +104,7 @@ export default function MerchantSlug() {
           <div>
             <p className="text-gray-400 text-sm mb-1">Wallet Address</p>
             <p className="text-md font-mono bg-gray-800 p-2 rounded-lg inline-block break-words">
-              {accountDetails || "Not logged in"}
+              {user || "Not logged in"}
             </p>
           </div>
         </div>
@@ -121,7 +129,7 @@ export default function MerchantSlug() {
             onClick={handleOpenModal}
           >
             <FaArrowUp className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">Issue Payment</span>
+            <span className="text-sm"> Create Account</span>
           </div>
           <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
             <FaMoneyBillWave className="text-2xl mx-auto mb-2" />
@@ -134,29 +142,56 @@ export default function MerchantSlug() {
           <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
             <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md space-y-4">
               <h2 className="text-xl font-bold mb-4">Create Payment Request</h2>
-              <label className="text-sm">Description</label>
-              <input
-                type="text"
-                className="w-full p-2 rounded bg-gray-800 text-white"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+              <div className="mb-4">
+                <label htmlFor="shopName" className="block mb-2 font-medium">
+                  Shop Name
+                </label>
+                <input
+                  type="text"
+                  id="shopName"
+                  value={shopName}
+                  onChange={(e) => setShopName(e.target.value)}
+                  className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
+                  required
+                />
+              </div>
 
-              <label className="text-sm">Coin Type</label>
-              <input
-                type="text"
-                className="w-full p-2 rounded bg-gray-800 text-white"
-                value={coinType}
-                onChange={(e) => setCoinType(e.target.value)}
-              />
+              <div className="mb-4">
+                <label htmlFor="username" className="block mb-2 font-medium">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
+                />
+              </div>
 
-              <label className="text-sm">Amount (in smallest units)</label>
-              <input
-                type="number"
-                className="w-full p-2 rounded bg-gray-800 text-white"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
+              <div className="mb-4">
+                <label
+                  htmlFor="profilePicture"
+                  className="block mb-2 font-medium"
+                >
+                  Profile Picture URL
+                </label>
+                <input
+                  type="text"
+                  id="profilePicture"
+                  value={profilePicture}
+                  onChange={(e) => setProfilePicture(e.target.value)}
+                  className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
+                />
+              </div>
+
+              {/* <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
+              >
+                {isLoading ? "Creating..." : "Create Payment Account"}
+              </button> */}
 
               <div className="flex justify-between mt-4">
                 <button
@@ -166,10 +201,10 @@ export default function MerchantSlug() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleGeneratePayId}
+                  onClick={handleSubmit}
                   className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
                 >
-                  Generate Pay Link
+                  Create Merchant Account
                 </button>
               </div>
 

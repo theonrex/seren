@@ -9,14 +9,14 @@ import Balance from "@/components/Balance";
 import { getZkLoginWalletAddress } from "@/utils/getZkLoginAddress";
 import { Button } from "flowbite-react";
 import FetchAccount from "@/components/dashboard";
-import ClientPage from "@/components/Clinet";
+import ClientPage from "@/components/Client";
+import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
+
 // This is a publically accessible page, displaying optional contents for signed-in users.
 export default function Index() {
-  const { user, isLoading } = useZkLoginSession();
+  const account = useCurrentAccount();
 
-  if (isLoading) return <p>Loading zkLogin session...</p>;
-
-  if (user) {
+  if (account) {
     // Signed-in experience.
     return (
       <div className="container mx-auto max-w-screen-xl">
@@ -40,7 +40,7 @@ export default function Index() {
             <h1>SuiPay</h1>
           </div>
           <div>
-            <Link href={LOGIN_PAGE_PATH}>Sign in</Link>
+            <ConnectButton />{" "}
           </div>
         </div>
         <div className={styles.gradinetImg}>

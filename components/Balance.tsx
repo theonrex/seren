@@ -8,19 +8,30 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 import { AiOutlinePlus } from "react-icons/ai";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 
 export default function Balance() {
-  const { user, isLoading } = useZkLoginSession();
   const [balance, setBalance] = useState<string | null>(null);
+  const account = useCurrentAccount();
+  const suiClient = useSuiClient();
 
   useEffect(() => {
-    const address = user?.wallet;
-    if (!address) return;
+    const fetchBalance = async () => {
+      if (!account?.address) return;
 
-    getSuiBalance(address).then(setBalance).catch(console.error);
-  }, [user, isLoading]);
+      const response = await suiClient.getBalance({
+        owner: account.address,
+      });
 
-  if (isLoading) {
+      // balance is in Mist, convert to SUI (1 SUI = 10^9 Mist)
+      const sui = Number(response.totalBalance) / 1_000_000_000;
+      setBalance(sui.toFixed(3)); // round to 3 decimal places
+    };
+
+    fetchBalance();
+  }, [account?.address, suiClient]);
+
+  if (!account) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
@@ -39,7 +50,7 @@ export default function Balance() {
           <div>
             <p className="text-gray-400 text-sm mb-1">Wallet Address</p>
             <p className="text-md font-mono bg-gray-800 p-2 rounded-lg inline-block break-words">
-              {user?.wallet || "Not logged in"}
+              {account?.address || "Not logged in"}
             </p>
           </div>
         </div>

@@ -8,11 +8,17 @@ import { AiOutlinePlus } from "react-icons/ai";
 import IssuePaymentModal from "./modal";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
+import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
+import { Transaction } from "@mysten/sui/transactions";
 
 export default function MerchantSlug({ merchantAddress }) {
-  const { user, isLoading } = useZkLoginSession();
+  const account = useCurrentAccount();
+
+  const user = account?.address;
   const [balance, setBalance] = useState(null);
   const [pendingPayments, setPendingPayments] = useState(null); // State to store pending payments
+  const isLoading = !account?.address;
 
   // Payment parameters
   useEffect(() => {
@@ -53,6 +59,7 @@ export default function MerchantSlug({ merchantAddress }) {
     return amount;
   };
 
+  console.log("pendingPayments", pendingPayments);
   console.log("pendingPayments", pendingPayments);
   console.log("merchantAddress", merchantAddress);
 

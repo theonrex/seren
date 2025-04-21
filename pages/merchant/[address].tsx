@@ -2,9 +2,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { PaymentClient } from "../../payment/src/payment-client";
+// import { PaymentClient } from "../../payment/src/payment-client";
 import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import MerchantSlug from "@/components/merchant/merchantSlug";
+import { Transaction } from "@mysten/sui/transactions";
+import { PaymentClient } from "../../payment/src/payment-client";
+import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 interface AccountDetailPageProps {
   address?: string;
 }
@@ -17,7 +21,9 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
 
   // Get the address from the router if not provided as a prop
   const accountAddress = address || (router.query.address as string);
+  const account = useCurrentAccount();
 
+  const user = account?.address;
   useEffect(() => {
     // Don't fetch until the router is ready and we have an address
     if (!router.isReady || !accountAddress) return;
@@ -47,10 +53,7 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
       }
 
       // If not found in localStorage or doesn't match, fetch from API
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        testKeypair.toSuiAddress()
-      );
+      const paymentClient = await PaymentClient.init(NETWORK, user);
 
       // Get all accounts and find the one matching the address
       const userAccounts = paymentClient.getUserPaymentAccounts();

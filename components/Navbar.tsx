@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { suiPayImg } from "@/images";
+import { ConnectButton } from "@mysten/dapp-kit";
 export default function Navbar() {
   return (
     <div>
@@ -47,7 +48,7 @@ export default function Navbar() {
                   className="block py-2 px-3 text-white rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
                   aria-current="page"
                 >
-                Merchant
+                  Merchant
                 </a>
               </li>{" "}
               <li>
@@ -59,6 +60,9 @@ export default function Navbar() {
                 >
                   Claim Faucet
                 </a>
+              </li>
+              <li>
+                <ConnectButton />
               </li>
             </ul>
           </div>
