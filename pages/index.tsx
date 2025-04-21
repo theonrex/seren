@@ -9,6 +9,7 @@ import Balance from "@/components/Balance";
 import { getZkLoginWalletAddress } from "@/utils/getZkLoginAddress";
 import { Button } from "flowbite-react";
 import FetchAccount from "@/components/dashboard";
+import ClientPage from "@/components/Clinet";
 // This is a publically accessible page, displaying optional contents for signed-in users.
 export default function Index() {
   const { user, isLoading } = useZkLoginSession();
@@ -21,9 +22,8 @@ export default function Index() {
       <div className="container mx-auto max-w-screen-xl">
         {/* <h1>Hello, {user.oidProvider} user!</h1> */}
         <div>
-          <Balance />
-
-          <FetchAccount />
+          <ClientPage />
+          {/* <FetchAccount /> */}
         </div>
         <div>
           <Link href={`${AUTH_API_BASE}/logout`}>Sign out</Link>

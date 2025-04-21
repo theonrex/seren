@@ -32,7 +32,7 @@ export default function Balance() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white px-4 py-6 font-sans">
+    <div className=" bg-[#0e0e0e] text-white px-4 py-6 font-sans">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Wallet Address */}
         <div className="flex items-center justify-between">
@@ -67,73 +67,6 @@ export default function Balance() {
           <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
             <FaMoneyBillWave className="text-2xl mx-auto mb-2" />
             <span className="text-sm">Earn</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Pending Section */}
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold">Pending</h3>
-              <a href="#" className="text-blue-400 text-sm hover:underline">
-                See All
-              </a>
-            </div>
-            <div className="space-y-3">
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="bg-gray-800 rounded-xl p-4 flex justify-between items-center"
-                >
-                  <div className="flex items-center gap-3">
-                    <AiOutlinePlus className="text-green-500 text-xl" />
-                    <div>
-                      <p className="text-sm">Payment from Julien...</p>
-                      <p className="text-xs text-gray-400">
-                        12.03.2025 - 14:02:34
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-green-400 font-semibold">
-                    +$1233.23
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* History Section */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3">History</h3>
-            <div className="space-y-3">
-              {[1, 2, 3, 4].map((i, idx) => (
-                <div
-                  key={i}
-                  className="bg-gray-800 rounded-xl p-4 flex justify-between items-center"
-                >
-                  <div className="flex items-center gap-3">
-                    {idx === 2 ? (
-                      <FaPaperPlane className="text-red-500 text-xl" />
-                    ) : (
-                      <FaPaperPlane className="text-blue-400 text-xl" />
-                    )}
-                    <div>
-                      <p className="text-sm">To julien.sui</p>
-                      <p className="text-xs text-gray-400">
-                        12.03.2025 - 14:02:34
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={`font-semibold ${
-                      idx === 2 ? "text-red-400" : "text-green-400"
-                    }`}
-                  >
-                    {idx === 2 ? "-$1233.23" : "+$1233.23"}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

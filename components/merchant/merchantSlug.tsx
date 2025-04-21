@@ -3,83 +3,58 @@
 import React, { useEffect, useState } from "react";
 import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { getSuiBalance } from "@/utils/getBalance";
-import {
-  FaArrowDown,
-  FaArrowUp,
-  FaMoneyBillWave,
-  FaPaperPlane,
-} from "react-icons/fa";
+import { FaArrowDown, FaMoneyBillWave } from "react-icons/fa";
 import { AiOutlinePlus } from "react-icons/ai";
-
-// Sui Payment Setup
-import { Transaction } from "@mysten/sui/transactions";
+import IssuePaymentModal from "./modal";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 
-export default function MerchantSlug({ accountDetails }) {
+export default function MerchantSlug({ merchantAddress }) {
   const { user, isLoading } = useZkLoginSession();
-  const [balance, setBalance] = useState<string | null>(null);
-  const [isIssuing, setIsIssuing] = useState(false);
+  const [balance, setBalance] = useState(null);
+  const [pendingPayments, setPendingPayments] = useState(null); // State to store pending payments
 
+  // Payment parameters
   useEffect(() => {
-    const address = accountDetails;
+    const address = merchantAddress;
     if (!address) return;
 
     getSuiBalance(address).then(setBalance).catch(console.error);
   }, [user, isLoading]);
 
-  const handleIssuePayment = async () => {
-    setIsIssuing(true);
-    try {
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        testKeypair.toSuiAddress(),
-        ACCOUNT
-      );
+  // Fetch pending payments
+  useEffect(() => {
+    if (!merchantAddress) return; // Ensure merchantAddress is available
 
-      const tx = new Transaction();
-      tx.setGasBudget(1000000000); // Wallet sets gas in prod
-
-      // Payment details
-      paymentClient.issuePayment(
-        tx,
-        "large coffee", // memo
-        "0x2::sui::SUI", // token type (SUI native)
-        10n // amount (10 smallest units = 0.00000001 SUI)
-      );
-
-      const result = await paymentClient.client.signAndExecuteTransaction({
-        signer: testKeypair,
-        transaction: tx,
-        options: { showEffects: true, showEvents: true },
-        requestType: "WaitForLocalExecution",
-      });
-
-      if (result.effects?.status.status !== "success") {
-        console.error("Payment failed:", result.effects?.status.error);
-        alert("Payment failed. Check console.");
-        return;
+    const fetchPendingPayments = async () => {
+      try {
+        const paymentClient = await PaymentClient.init(
+          NETWORK,
+          testKeypair.toSuiAddress(),
+          merchantAddress
+        );
+        const payments = await paymentClient.getPendingPayments();
+        setPendingPayments(payments); // Assuming payments is an object
+      } catch (error) {
+        console.error("Error fetching pending payments:", error);
       }
+    };
 
-      const data = result.events?.[0]?.parsedJson;
-      const [paymentId, amount, issuedBy] = [
-        data?.payment_id,
-        data?.amount,
-        data?.issued_by,
-      ];
+    fetchPendingPayments();
+  }, [merchantAddress]);
 
-      console.log("✅ Payment issued!");
-      console.log("Payment ID:", paymentId);
-      console.log("Amount:", amount);
-      console.log("Issued By:", issuedBy);
-      alert(`✅ Payment issued:\nID: ${paymentId}\nAmount: ${amount}`);
-    } catch (err) {
-      console.error("❌ Issue Payment Error:", err);
-      alert("❌ Issue Payment Error. Check console.");
-    } finally {
-      setIsIssuing(false);
+  // Helper function to convert BigInt to a readable format with decimals
+  const formatAmount = (amount) => {
+    if (typeof amount === "bigint") {
+      // Assuming SUI has 9 decimals
+      const amountInDecimal = Number(amount) / 1e9;
+      return amountInDecimal.toFixed(9); // Formatting to 9 decimal places
     }
+    return amount;
   };
+
+  console.log("pendingPayments", pendingPayments);
+  console.log("merchantAddress", merchantAddress);
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white px-4 py-6 font-sans">
@@ -89,7 +64,7 @@ export default function MerchantSlug({ accountDetails }) {
           <div>
             <p className="text-gray-400 text-sm mb-1">Wallet Address</p>
             <p className="text-md font-mono bg-gray-800 p-2 rounded-lg inline-block break-words">
-              {accountDetails || "Not logged in"}
+              {merchantAddress || "Not logged in"}
             </p>
           </div>
         </div>
@@ -110,17 +85,9 @@ export default function MerchantSlug({ accountDetails }) {
             <FaArrowDown className="text-2xl mx-auto mb-2" />
             <span className="text-sm">Deposit</span>
           </div>
-          <div
-            className={`bg-gray-800 p-4 rounded-xl transition cursor-pointer ${
-              isIssuing ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-700"
-            }`}
-            onClick={() => !isIssuing && handleIssuePayment()}
-          >
-            <FaArrowUp className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">
-              {isIssuing ? "Issuing..." : "Issue Payment"}
-            </span>
-          </div>
+
+          <IssuePaymentModal merchantAddress={merchantAddress} />
+
           <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
             <FaMoneyBillWave className="text-2xl mx-auto mb-2" />
             <span className="text-sm">Earn</span>
@@ -137,62 +104,39 @@ export default function MerchantSlug({ accountDetails }) {
               </a>
             </div>
             <div className="space-y-3">
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="bg-gray-800 rounded-xl p-4 flex justify-between items-center"
-                >
-                  <div className="flex items-center gap-3">
-                    <AiOutlinePlus className="text-green-500 text-xl" />
-                    <div>
-                      <p className="text-sm">Payment from Julien...</p>
-                      <p className="text-xs text-gray-400">
-                        12.03.2025 - 14:02:34
-                      </p>
+              {pendingPayments && Object.keys(pendingPayments).length > 0 ? (
+                Object.keys(pendingPayments).map((key) => {
+                  const payment = pendingPayments[key];
+                  return (
+                    <div
+                      key={key}
+                      className="bg-gray-800 rounded-xl p-4 flex justify-between items-center"
+                    >
+                      <div className="flex items-center gap-3">
+                        <AiOutlinePlus className="text-green-500 text-xl" />
+                        <div>
+                          <p className="text-sm">
+                            {payment.fields.description}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {payment.date}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-green-400 font-semibold">
+                        +${formatAmount(payment.args.amount)}
+                      </span>
                     </div>
-                  </div>
-                  <span className="text-green-400 font-semibold">
-                    +$1233.23
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* History Section */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3">History</h3>
-            <div className="space-y-3">
-              {[1, 2, 3, 4].map((i, idx) => (
-                <div
-                  key={i}
-                  className="bg-gray-800 rounded-xl p-4 flex justify-between items-center"
-                >
-                  <div className="flex items-center gap-3">
-                    {idx === 2 ? (
-                      <FaPaperPlane className="text-red-500 text-xl" />
-                    ) : (
-                      <FaPaperPlane className="text-blue-400 text-xl" />
-                    )}
-                    <div>
-                      <p className="text-sm">To julien.sui</p>
-                      <p className="text-xs text-gray-400">
-                        12.03.2025 - 14:02:34
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={`font-semibold ${
-                      idx === 2 ? "text-red-400" : "text-green-400"
-                    }`}
-                  >
-                    {idx === 2 ? "-$1233.23" : "+$1233.23"}
-                  </span>
-                </div>
-              ))}
+                  );
+                })
+              ) : (
+                <p className="text-gray-400">No pending payments</p>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Payment Modal */}
       </div>
     </div>
   );

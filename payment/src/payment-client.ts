@@ -402,3 +402,5 @@ export class PaymentClient extends AccountSDK {
 	}
 }
 
+// console.log("result", result)
+// console.log("data", data)

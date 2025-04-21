@@ -41,7 +41,7 @@ export default function Index() {
     try {
       const paymentClient = await PaymentClient.init(
         NETWORK,
-        testKeypair.toSuiAddress()
+        "0x29798d2f9bea9f6f5950410ee0fa940635920f84e5f2035e6046d55bcc58aee6"
       );
       const userProfileData = paymentClient.getUserProfile();
       setUserProfile(userProfileData);
@@ -80,16 +80,16 @@ export default function Index() {
       );
 
       await paymentClient.switchAccount(selectedAccountId);
-      const accountDetails = paymentClient.paymentAccount;
-      console.log("accountDetails", accountDetails);
+      const merchantAddress = paymentClient.paymentAccount;
+      console.log("merchantAddres smerchantAddress", merchantAddress);
 
       // Get the account address from the account details
-      const accountAddress = accountDetails.id || selectedAccountId;
+      const accountAddress = merchantAddress.id || selectedAccountId;
 
       // Instead of storing the entire account object, only store necessary properties
       // Extract only the data you need to persist
       const accountToStore = {
-        id: accountDetails.id,
+        id: merchantAddress.id,
       };
 
       // Store the simplified object

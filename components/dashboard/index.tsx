@@ -134,58 +134,7 @@ export default function FetchAccount() {
         )}
 
         {/* Find account by name */}
-        <form onSubmit={findAccountByName} className="mb-6">
-          <div className="mb-4">
-            <label htmlFor="shopName" className="block mb-2 font-medium">
-              Shop Name
-            </label>
-            <input
-              type="text"
-              id="shopName"
-              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
-          >
-            {isLoading ? "Searching..." : "Find Account by Name"}
-          </button>
-        </form>
-
-        {/* Account selection form */}
-        <form onSubmit={handleSelectAccount}>
-          <div className="mb-4">
-            <label htmlFor="accountSelect" className="block mb-2 font-medium">
-              Select Account
-            </label>
-            <select
-              id="accountSelect"
-              value={selectedAccountId}
-              onChange={(e) => setSelectedAccountId(e.target.value)}
-              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-              disabled={accounts.length === 0 || isLoading}
-            >
-              <option value="">Select an account</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name} ({account.id})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading || !selectedAccountId}
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
-          >
-            {isLoading ? "Loading..." : "Load Account"}
-          </button>
-        </form>
+    
 
         {currentAccount && (
           <div className="mt-6">
@@ -208,13 +157,6 @@ export default function FetchAccount() {
           <title>Get Payment Account</title>
           <meta name="description" content="Get your payment account details" />
         </Head>
-
-        <main>
-          <h1 className="text-2xl font-bold mb-6 text-center">
-            Payment Account Details
-          </h1>
-          <GetPaymentAccount />
-        </main>
       </div>
     </div>
   );

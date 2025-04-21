@@ -1,13 +1,28 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
+import { ThemeModeScript } from "flowbite-react";
+import Head from "next/head";
+import "flowbite";
 
-export default function Layout() {
+type LayoutProps = {
+  children: ReactNode;
+};
+
+export default function Layout({ children }: LayoutProps) {
   return (
-    <div>
-      <Toaster position="top-right" />
+    <>
+      <Head>
+        <ThemeModeScript />
+        <link
+          href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"
+          rel="stylesheet"
+        />
+      </Head>
 
+      <Toaster position="top-right" />
       <Navbar />
-    </div>
+      <main>{children}</main>
+    </>
   );
 }

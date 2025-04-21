@@ -130,7 +130,7 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
           <div className="bg-black text-white rounded shadow border border-gray-700 p-6">
             {accountDetails ? (
               <>
-                <MerchantSlug accountDetails={accountDetails.id} />
+                <MerchantSlug merchantAddress={accountDetails.id} />
                 <div className="grid grid-cols-1 gap-6 mb-6">
                   <div>
                     <h2 className="text-xl font-semibold mb-2">

@@ -10,12 +10,11 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 import { AiOutlinePlus } from "react-icons/ai";
-
 import { Transaction } from "@mysten/sui/transactions";
-import { PaymentClient } from "../../src/payment-client";
-import { ACCOUNT, NETWORK, testKeypair } from "./utils";
+import { PaymentClient } from "../../payment/src/payment-client";
+import { NETWORK } from "../../payment/test/ptbs/utils";
 
-export default function MerchantSlug({ accountDetails }) {
+export default function MerchantSlug() {
   const { user, isLoading } = useZkLoginSession();
   const [balance, setBalance] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,34 +23,49 @@ export default function MerchantSlug({ accountDetails }) {
   const [amount, setAmount] = useState("0");
   const [generatedPayId, setGeneratedPayId] = useState("");
 
-  useEffect(() => {
-    const address = accountDetails;
-    if (!address) return;
+  // Get the user address from ZkLogin session or fallback to accountDetails
+  const userAddress = user?.userAddr || accountDetails;
 
-    getSuiBalance(address).then(setBalance).catch(console.error);
-  }, [user, isLoading]);
+  useEffect(() => {
+    if (!userAddress) return;
+    getSuiBalance(userAddress).then(setBalance).catch(console.error);
+  }, [user, isLoading, userAddress]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
 
   const handleGeneratePayId = async () => {
+    if (!user) {
+      alert("Please connect your wallet with zkLogin first");
+      return;
+    }
+
     try {
       const tx = new Transaction();
       tx.setGasBudget(1000000000);
 
+      // Initialize payment client with the user's address
       const paymentClient = await PaymentClient.init(
         NETWORK,
-        testKeypair.toSuiAddress(),
-        ACCOUNT
+        userAddress,
+        userAddress // Using user's address instead of hardcoded ACCOUNT
       );
 
+      // Issue the payment
       paymentClient.issuePayment(tx, description, coinType, BigInt(amount));
 
-      const result = await paymentClient.client.signAndExecuteTransaction({
-        signer: testKeypair,
-        transaction: tx,
-        options: { showEffects: true, showEvents: true },
+      // Set the sender to the user's address
+      tx.setSender(userAddress);
+
+      // Use the zkLogin session to sign and execute the transaction
+      // This assumes the Shinami zkLogin SDK provides a way to sign and execute transactions
+      const result = await user.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+        options: {
+          showEffects: true,
+          showEvents: true,
+        },
         requestType: "WaitForLocalExecution",
       });
 
@@ -61,12 +75,16 @@ export default function MerchantSlug({ accountDetails }) {
         return;
       }
 
+      // Extract payment ID from the results
       const payId = result.events?.[0]?.parsedJson?.payment_id;
       const link = `${window.location.origin}/pay/${payId}`;
       setGeneratedPayId(link);
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Error generating Pay ID.");
+      alert(
+        "Error generating Pay ID: " +
+          (err instanceof Error ? err.message : String(err))
+      );
     }
   };
 
