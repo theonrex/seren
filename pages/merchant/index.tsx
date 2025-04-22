@@ -39,7 +39,7 @@ export default function Index() {
 
   useEffect(() => {
     fetchUserAccounts();
-  }, []);
+  }, [user]);
 
   const fetchUserAccounts = async () => {
     setLoading(true);

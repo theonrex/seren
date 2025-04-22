@@ -5,7 +5,7 @@ import "../styles/global.css";
 import "flowbite";
 import Layout from "./layout";
 // import { SuiClientProvider } from "@/contexts/SuiClientContext"; // adjust path as needed
-
+import "../styles/main.css"
 import "@mysten/dapp-kit/dist/index.css";
 
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
