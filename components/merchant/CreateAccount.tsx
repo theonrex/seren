@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { getSuiBalance } from "@/utils/getBalance";
@@ -15,10 +13,15 @@ import { PaymentClient } from "../../payment/src/payment-client";
 import { NETWORK } from "../../payment/test/ptbs/utils";
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import Link from "next/link";
+
+// Firebase imports
+import { db, storage } from "@/firebase"; // Import Firebase utils
+import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function MerchantSlug() {
   const account = useCurrentAccount();
-
   const user = account?.address;
   const [balance, setBalance] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,8 +29,6 @@ export default function MerchantSlug() {
   const [coinType, setCoinType] = useState("0x2::sui::SUI");
   const [amount, setAmount] = useState("0");
   const [generatedPayId, setGeneratedPayId] = useState("");
-  // const isLoading = !account?.address;
-
   const [shopName, setShopName] = useState("");
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
@@ -36,17 +37,22 @@ export default function MerchantSlug() {
   const [error, setError] = useState("");
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const [digest, setDigest] = useState("");
-  const currentAccount = useCurrentAccount();
-  // Get the user address from ZkLogin session or fallback to accountDetails
-  const userAddress = user;
-  console.log("NETWORK", NETWORK);
+
+  // Get user balance
   useEffect(() => {
-    if (!userAddress) return;
-    getSuiBalance(userAddress).then(setBalance).catch(console.error);
-  }, [user, isLoading, userAddress]);
+    if (!user) return;
+    getSuiBalance(user).then(setBalance).catch(console.error);
+  }, [user]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = async (file) => {
+    const storageRef = ref(storage, `profile_pictures/${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,10 +65,14 @@ export default function MerchantSlug() {
       const tx = new Transaction();
       const paymentClient = await PaymentClient.init(NETWORK, user);
 
+      // Create the payment account and log the transaction
       paymentClient.createPaymentAccount(tx, shopName, {
         username: username,
         profilePicture: profilePicture,
       });
+
+      // Log the transaction object before executing it
+      console.log("Created Transaction:", tx);
 
       signAndExecuteTransaction(
         {
@@ -70,17 +80,41 @@ export default function MerchantSlug() {
           chain: "sui:testnet",
         },
         {
-          onSuccess: (result) => {
-            console.log("object changes", result.objectChanges);
+          onSuccess: async (result) => {
             setDigest(result.digest);
             setMessage("Payment account created successfully");
-            setShopName("");
-            setUsername("");
-            setProfilePicture("");
+            console.log("Transaction result:", result);
+
+            // Store data in Firestore
+            try {
+              const dataToStore = {
+                userAddress: user,
+                shopName,
+                username,
+                profilePicture,
+                transactionDigest: result.digest,
+                // transaction: result,
+              };
+
+              // If profile picture URL is provided, upload it to Firebase Storage
+              if (profilePicture && profilePicture.startsWith("data:image")) {
+                const uploadedImageUrl = await handleImageUpload(
+                  profilePicture
+                );
+                dataToStore.profilePicture = uploadedImageUrl;
+              }
+
+              await addDoc(collection(db, "paymentAccounts"), dataToStore);
+              setShopName("");
+              setUsername("");
+              setProfilePicture("");
+            } catch (err) {
+              console.error("Error storing data in Firestore:", err);
+            }
           },
           onError: (err) => {
             setError(err instanceof Error ? err.message : "Transaction failed");
-            console.error(err);
+            console.error("Transaction error:", err);
           },
           onSettled: () => {
             setIsLoading(false);
@@ -91,16 +125,17 @@ export default function MerchantSlug() {
       setError(
         err instanceof Error ? err.message : "Failed to create payment account"
       );
-      console.error(err);
-      setIsLoading(false); // In case the try block fails before `signAndExecuteTransaction`
+      console.error("Error creating payment account:", err);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white px-4 py-6 font-sans">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen container">
+      <Link href="/merchant">Merchant</Link>
+      <div className="card">
         {/* Wallet Address & Balance */}
-        <div className="flex items-center justify-between">
+        <div className="card-header">
           <div>
             <p className="text-gray-400 text-sm mb-1">Wallet Address</p>
             <p className="text-md font-mono bg-gray-800 p-2 rounded-lg inline-block break-words">
@@ -109,121 +144,72 @@ export default function MerchantSlug() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-md">
-          <div>
-            <p className="text-gray-400 text-sm mb-1">Total Balance</p>
-            <h2 className="text-4xl font-bold">
-              {balance !== null ? `${balance} SUI` : "Loading..."}
-            </h2>
-          </div>
+        <div className="card-content">
+          <p className="text-gray-400 text-sm mb-1">Total Balance</p>
+          <h2 className="text-4xl font-bold">
+            {balance !== null ? `${balance} SUI` : "Loading..."}
+          </h2>
         </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-6 text-center">
-          <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
-            <FaArrowDown className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">Deposit</span>
+        {/* Create Payment Request */}
+        <div className="card-content">
+          <h2 className="text-xl font-bold mb-4">Create Payment Request</h2>
+
+          <div className="mb-4">
+            <label htmlFor="shopName" className="block mb-2 font-medium">
+              Shop Name
+            </label>
+            <input
+              type="text"
+              id="shopName"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              required
+            />
           </div>
-          <div
-            className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-            onClick={handleOpenModal}
-          >
-            <FaArrowUp className="text-2xl mx-auto mb-2" />
-            <span className="text-sm"> Create Account</span>
+
+          <div className="mb-4">
+            <label htmlFor="username" className="block mb-2 font-medium">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
           </div>
-          <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
-            <FaMoneyBillWave className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">Earn</span>
+
+          <div className="mb-4">
+            <label htmlFor="profilePicture" className="block mb-2 font-medium">
+              Profile Picture URL
+            </label>
+            <input
+              type="text"
+              id="profilePicture"
+              value={profilePicture}
+              onChange={(e) => setProfilePicture(e.target.value)}
+            />
           </div>
-        </div>
 
-        {/* Payment Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md space-y-4">
-              <h2 className="text-xl font-bold mb-4">Create Payment Request</h2>
-              <div className="mb-4">
-                <label htmlFor="shopName" className="block mb-2 font-medium">
-                  Shop Name
-                </label>
-                <input
-                  type="text"
-                  id="shopName"
-                  value={shopName}
-                  onChange={(e) => setShopName(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-                  required
-                />
-              </div>
+          <div className="flex justify-between mt-4">
+            <button onClick={handleSubmit}>Create Merchant Account</button>
+          </div>
 
-              <div className="mb-4">
-                <label htmlFor="username" className="block mb-2 font-medium">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="profilePicture"
-                  className="block mb-2 font-medium"
-                >
-                  Profile Picture URL
-                </label>
-                <input
-                  type="text"
-                  id="profilePicture"
-                  value={profilePicture}
-                  onChange={(e) => setProfilePicture(e.target.value)}
-                  className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-                />
-              </div>
-
-              {/* <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
+          {generatedPayId && (
+            <div className="mt-4 bg-gray-800 p-3 rounded text-sm break-words">
+              <strong>Pay Link:</strong>
+              <br />
+              <a
+                href={generatedPayId}
+                className="text-blue-400 underline"
+                target="_blank"
               >
-                {isLoading ? "Creating..." : "Create Payment Account"}
-              </button> */}
-
-              <div className="flex justify-between mt-4">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
-                >
-                  Create Merchant Account
-                </button>
-              </div>
-
-              {generatedPayId && (
-                <div className="mt-4 bg-gray-800 p-3 rounded text-sm break-words">
-                  <strong>Pay Link:</strong>
-                  <br />
-                  <a
-                    href={generatedPayId}
-                    className="text-blue-400 underline"
-                    target="_blank"
-                  >
-                    {generatedPayId}
-                  </a>
-                </div>
-              )}
+                {generatedPayId}
+              </a>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -9,13 +9,13 @@ import {
 import { PaymentClient } from "../../payment/src/payment-client";
 import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import ProfilePage from "@/components/Profile/profilePage";
-
+import { ConnectButton } from "@mysten/dapp-kit";
+import ConnectWallet from "@/components/connectWallet";
 export default function Profile() {
   const currentAccount = useCurrentAccount();
   const account = useCurrentAccount();
 
-  const ACCOUNT =
-    "0x21aa14a1466461b3096ca43420f38d8c6002e01684dcb9f28feb0eb5c99912ae";
+
 
   const user = account?.address;
   const { mutate: signAndExecuteTransactionBlock } =
@@ -45,12 +45,9 @@ export default function Profile() {
         setLoading(true);
 
         const paymentClient = await PaymentClient.init(NETWORK, user);
-        // const paymentClients = await PaymentClient.init(NETWORK, user, ACCOUNT);
-
         // Get all user accounts and switch
         const userAccounts = paymentClient.getUserPaymentAccounts();
-        // const paymentConfig = paymentClient.getPaymentAccountConfig();
-        // const paymentName = paymentClients.getPaymentAccountName();
+   
         const userProfile = paymentClient.getUserProfile();
 
         // setPaymentsConfig(paymentConfig);
@@ -66,33 +63,19 @@ export default function Profile() {
 
     fetchPaymentData();
   }, [account]);
-  //   useEffect(() => {
-  //     const fetchPaymentData = async () => {
-  //       if (!user) return;
-
-  //       try {
-  //         setLoading(true);
-
-  //         const paymentClients = await PaymentClient.init(NETWORK, user, ACCOUNT);
-
-  //         const objects = paymentClients.getOwnedObjects();
-  //         setOwnedObjects(objects);
-  //       } catch (err) {
-  //         console.error("Error loading payment data:", err);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-
-  //     fetchPaymentData();
-  //   }, [account]);
 
   return (
     <div className="p-4">
-      <ProfilePage
-        paymentAccount={paymentAccount}
-        userProfileInfo={userProfileInfo}
-      />
+      {account ? (
+        <div>
+          <ProfilePage
+            paymentAccount={paymentAccount}
+            userProfileInfo={userProfileInfo}
+          />
+        </div>
+      ) : (
+        <ConnectWallet />
+      )}
     </div>
   );
 }

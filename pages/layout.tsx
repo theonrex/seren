@@ -4,6 +4,8 @@ import { Toaster } from "react-hot-toast";
 import { ThemeModeScript } from "flowbite-react";
 import Head from "next/head";
 import "flowbite";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type LayoutProps = {
   children: ReactNode;
@@ -23,6 +25,7 @@ export default function Layout({ children }: LayoutProps) {
       <Toaster position="top-right" />
       <Navbar />
       <main>{children}</main>
+      <ToastContainer position="top-right" autoClose={5000} />
     </>
   );
 }

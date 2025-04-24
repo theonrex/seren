@@ -1,0 +1,9 @@
+.nav_ul {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav_ul li a {
+  color: white !important;
+}

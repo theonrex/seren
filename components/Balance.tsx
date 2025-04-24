@@ -1,83 +1,113 @@
 import { useEffect, useState } from "react";
-import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
-import { getSuiBalance } from "@/utils/getBalance";
 import {
   FaArrowDown,
   FaArrowUp,
   FaMoneyBillWave,
   FaPaperPlane,
 } from "react-icons/fa";
-import { AiOutlinePlus } from "react-icons/ai";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
+import Link from "next/link";
 
-export default function Balance() {
-  const [balance, setBalance] = useState<string | null>(null);
+export default function WalletOverview() {
+  const [suiBalance, setSuiBalance] = useState<number>(0);
+  const [usdcBalance, setUsdcBalance] = useState<number>(0);
+  const [suiPrice, setSuiPrice] = useState<number>(0);
+  const [usdcPrice, setUsdcPrice] = useState<number>(1);
   const account = useCurrentAccount();
   const suiClient = useSuiClient();
 
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchBalances = async () => {
       if (!account?.address) return;
 
-      const response = await suiClient.getBalance({
+      const suiResponse = await suiClient.getBalance({
         owner: account.address,
       });
+      const sui = Number(suiResponse.totalBalance) / 1_000_000_000;
+      setSuiBalance(sui);
 
-      // balance is in Mist, convert to SUI (1 SUI = 10^9 Mist)
-      const sui = Number(response.totalBalance) / 1_000_000_000;
-      setBalance(sui.toFixed(3)); // round to 3 decimal places
+      const usdcResponse = await suiClient.getBalance({
+        owner: account.address,
+        coinType:
+          "0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC",
+      });
+      const usdc = Number(usdcResponse.totalBalance) / 1_000_000;
+      setUsdcBalance(usdc);
+
+      const priceRes = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=sui,tether&vs_currencies=usd"
+      );
+      const prices = await priceRes.json();
+      setSuiPrice(prices?.sui?.usd || 0);
+      setUsdcPrice(prices?.tether?.usd || 1);
     };
 
-    fetchBalance();
+    fetchBalances();
   }, [account?.address, suiClient]);
+
+  const totalValue = (suiBalance * suiPrice + usdcBalance * usdcPrice).toFixed(
+    2
+  );
 
   if (!account) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-center">
-          <div className="animate-spin rounded-full border-t-4 border-b-4 border-white h-12 w-12 mb-4" />
-          <p className="text-lg font-medium">Loading session...</p>
+      <div className="wallet-container">
+        <div className="glass-panel text-center">
+          <div className="animate-spin rounded-full border-t-4 border-b-4 border-white h-12 w-12 mx-auto mb-4" />
+          <p>Loading session...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className=" bg-[#0e0e0e] text-white px-4 py-6 font-sans">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Wallet Address */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-gray-400 text-sm mb-1">Wallet Address</p>
-            <p className="text-md font-mono bg-gray-800 p-2 rounded-lg inline-block break-words">
-              {account?.address || "Not logged in"}
+    <div className="wallet-container">
+      <div className="max-w-4xl w-full space-y-10">
+        <div className="glass-panel">
+          <p className="subtitle">Total Wallet Value</p>
+          <h1 className="total-value">${totalValue}</h1>
+        </div>
+
+        <div className="grid grid-2">
+          <div className="glass-panel">
+            <p className="subtitle">SUI Balance</p>
+            <h2 className="token-name">{suiBalance.toFixed(3)} SUI</h2>
+            <p className="token-value">
+              (${(suiBalance * suiPrice).toFixed(2)})
+            </p>
+          </div>
+          <div className="glass-panel">
+            <p className="subtitle">USDC Balance</p>
+            <h2 className="token-name">{usdcBalance.toFixed(2)} USDC</h2>
+            <p className="token-value">
+              (${(usdcBalance * usdcPrice).toFixed(2)})
             </p>
           </div>
         </div>
 
-        {/* Balance Card */}
-        <div className="bg-gray-900 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-md">
-          <div>
-            <p className="text-gray-400 text-sm mb-1">Total Balance</p>
-            <h2 className="text-4xl font-bold">
-              {balance !== null ? `${balance} SUI` : "Loading..."}
-            </h2>
-          </div>
+        <div className="glass-panel">
+          <p className="subtitle">Wallet Address</p>
+          <p className="wallet-address">{account.address}</p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-6 text-center">
-          <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
-            <FaArrowDown className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">Deposit</span>
+        <div className="grid grid-4 text-center">
+          <Link className="glass-panel icon-box" href="/makepayment">
+            {" "}
+            <FaPaperPlane />
+            <span>Make Payment</span>
+          </Link>
+          <div className="glass-panel icon-box">
+            <FaArrowUp />
+            <span>Withdraw</span>
           </div>
-          <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
-            <FaArrowUp className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">Withdraw</span>
+          <div className="glass-panel icon-box">
+            <FaMoneyBillWave />
+            <span>Earn</span>
           </div>
-          <div className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer">
-            <FaMoneyBillWave className="text-2xl mx-auto mb-2" />
-            <span className="text-sm">Earn</span>
+          <div className="glass-panel icon-box">
+            {" "}
+            <FaArrowDown />
+            <span>Deposit</span>
           </div>
         </div>
       </div>

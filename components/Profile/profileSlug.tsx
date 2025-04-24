@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -12,6 +10,8 @@ import {
 import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { ACCOUNT, NETWORK } from "../../payment/test/ptbs/utils";
+import SetRecovery from "./setRecovery";
+import SetOwner from "./setOwner";
 // import "./ProfilePage.css
 
 export default function UserProfileDetailSlug() {
@@ -19,7 +19,7 @@ export default function UserProfileDetailSlug() {
   const { id } = router.query;
   const [copied, setCopied] = useState(false);
 
-  console.log("name", name);
+  // console.log("name", name);
   console.log("id", id);
 
   const currentAccount = useCurrentAccount();
@@ -32,8 +32,6 @@ export default function UserProfileDetailSlug() {
   const [paymentAccount, setPaymentAccount] = useState(null);
   const [ownedObjects, setOwnedObjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [recoveryAddress, setRecoveryAddress] = useState("");
-  const [newOwnerAddress, setNewOwnerAddress] = useState("");
   console.log("ownedObjects", ownedObjects);
   console.log("paymentAccount", paymentAccount);
 
@@ -88,40 +86,6 @@ export default function UserProfileDetailSlug() {
     fetchPaymentData();
   }, []);
 
-  // 🔒 Set recovery address (owner signs)
-  const handleSetRecovery = async () => {
-    if (!paymentClient || !recoveryAddress) return;
-
-    try {
-      const tx = new Transaction();
-      paymentClient.setRecoveryAddress(tx, recoveryAddress);
-      const result = await signAndExecute({ transactionBlock: tx });
-      console.log("Recovery address set:", result);
-    } catch (err) {
-      console.error("Failed to set recovery address:", err);
-    }
-  };
-
-  // 🔁 Set new owner (recovery address signs)
-  const handleRecoverOwner = async () => {
-    if (!paymentClient || !newOwnerAddress) return;
-
-    try {
-      const tx = new Transaction();
-      paymentClient.setOwnerAddress(tx, newOwnerAddress);
-      const result = await signAndExecute({ transactionBlock: tx });
-      console.log("Ownership recovered:", result);
-    } catch (err) {
-      console.error("Failed to recover ownership:", err);
-    }
-  };
-
-  const menuItems = [
-    { title: "Recovery", action: handleSetRecovery },
-    { title: "Transactions", action: () => alert("Transactions!") },
-    { title: "Security", action: () => alert("Security!") },
-  ];
-
   return (
     <div className="">
       <div className="profile-card">
@@ -149,38 +113,35 @@ export default function UserProfileDetailSlug() {
         </div>
       </div>
 
-      {loading && <p>Loading...</p>}
-
-      {/* {paymentAccount && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Payment Account</h2>
-          <pre className="bg-gray-100 p-2 rounded">
-            {JSON.stringify(paymentAccount, null, 2)}
-          </pre>
-        </div>
-      )} */}
-
-      {/* {ownedObjects.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Owned Objects</h2>
-          <pre className="bg-gray-100 p-2 rounded overflow-auto">
-            {JSON.stringify(ownedObjects, null, 2)}
-          </pre>
-        </div>
-      )} */}
-
       <div className="profile-section">
+        {loading && <p>Loading...</p>}
+
         <ul className="profile-links-list">
-          {paymentAccount?.metadata?.find((m: any) => m.key === "name")
-            ?.value || "N/A"}
-          {menuItems.map((item, i) => (
-            <li key={i} className="profile-link-item">
-              <button onClick={item.action}>
-                <span>{item.title}</span>
-                <FaChevronRight className="chevron-icon" />
-              </button>
-            </li>
-          ))}
+          <li className="profile-link-item">
+            {" "}
+            <div className="profile_div">
+              <span> Shop Name</span>
+              <span className="profile_link_span">
+                {paymentAccount?.metadata?.find((m: any) => m.key === "name")
+                  ?.value || "N/A"}
+                {/* <FaChevronRight className="chevron-icon" /> */}
+              </span>
+            </div>
+          </li>{" "}
+          <li className="profile-link-item">
+            {" "}
+            <div className="">
+              {" "}
+              <SetRecovery />
+              <span></span>
+            </div>
+          </li>{" "}
+          <li className="profile-link-item">
+            {" "}
+            <div className="">
+              <SetOwner />
+            </div>
+          </li>
         </ul>
       </div>
     </div>

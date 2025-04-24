@@ -49,14 +49,16 @@ export default function ClientPage() {
     try {
       setStatus("⏳ Processing payment...");
 
+      //8cb92d1ab261aefa3a7ffa516df2ca053c9f9f0325e7f09fdbef0202f0df12c3
+
       const paymentClient = await PaymentClient.init(
         NETWORK,
-        "0x21aa14a1466461b3096ca43420f38d8c6002e01684dcb9f28feb0eb5c99912ae",
+        account?.address,
         "0x21aa14a1466461b3096ca43420f38d8c6002e01684dcb9f28feb0eb5c99912ae"
       );
 
       const tx = new Transaction();
-      
+
       tx.setSender(account.address);
       // Optional: let the wallet set gas
       await paymentClient.makePayment(tx, paymentId, BigInt(tip));
@@ -90,44 +92,7 @@ export default function ClientPage() {
   return (
     <div className="p-4">
       <Balance />
-      <Button onClick={() => setOpenModal(true)}>Make Payment</Button>
 
-      <Modal show={openModal} onClose={() => setOpenModal(false)}>
-        <ModalHeader>Make Payment</ModalHeader>
-        <ModalBody>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-white">Payment ID</label>
-              <input
-                type="text"
-                value={paymentId}
-                onChange={(e) => setPaymentId(e.target.value)}
-                className="w-full rounded bg-gray-700 text-white px-3 py-2"
-                placeholder="Enter Payment ID"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-white">Tip (in MIST)</label>
-              <input
-                type="number"
-                value={tip}
-                onChange={(e) => setTip(e.target.value)}
-                className="w-full rounded bg-gray-700 text-white px-3 py-2"
-                placeholder="Enter optional tip"
-              />
-            </div>
-            {status && (
-              <p className="mt-2 text-sm text-center text-gray-400">{status}</p>
-            )}
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={handlePayment}>Pay</Button>
-          <Button color="gray" onClick={() => setOpenModal(false)}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
 
       {/* History Section */}
       <div className="mt-6">

@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProfilePage({ paymentAccount, userProfileInfo }) {
+  console.log("userProfileInfo", userProfileInfo);
+  console.log("paymentAccount", paymentAccount);
   return (
     <div className="opensea-profile-container">
       <div className="banner"></div>
@@ -23,26 +25,34 @@ export default function ProfilePage({ paymentAccount, userProfileInfo }) {
             {paymentAccount?.username || "Unnamed"}
           </h1>
           <p className="profile-address">
-            {paymentAccount?.wallet || "No wallet connected"}
+            Total Merchant Accounts: {userProfileInfo?.length || "0"}
           </p>
         </div>
       </div>
 
       <div className="profile-section">
-        <h2 className="section-title">User Profiles</h2>
-        <div className="user-info-grid">
-          {userProfileInfo?.map((user, index) => (
-            <Link
-              key={index}
-              href={`/profile/${user.id}`}
-              className="user-card-link"
-            >
-              <div className="user-card">
-                <p className="user-name">{user.name}</p>
-                <p className="user-id">{user.id}</p>
-              </div>
-            </Link>
-          ))}
+        <h2 className="section-title"> Merchants Account</h2>
+        <div className="">
+          {!userProfileInfo ? (
+            <div className="user-info-grid">
+              {userProfileInfo?.map((user, index) => (
+                <Link
+                  key={index}
+                  href={`/profile/${user.id}`}
+                  className="user-card-link"
+                >
+                  <div className="user-card">
+                    <p className="user-name">{user.name}</p>
+                    <p className="user-id">{user.id}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="Merchant_Link">
+              <Link href="/merchant/create">Create Merchant Account</Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

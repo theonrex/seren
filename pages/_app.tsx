@@ -6,7 +6,11 @@ import "flowbite";
 import Layout from "./layout";
 // import { SuiClientProvider } from "@/contexts/SuiClientContext"; // adjust path as needed
 import "../styles/main.css"
+import "../styles/nav.css"
+import "../styles/merchant.css"
+import "../styles/index.css"
 import "@mysten/dapp-kit/dist/index.css";
+
 
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";

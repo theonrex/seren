@@ -1,14 +1,12 @@
-// pages/account/[address].tsx
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-// import { PaymentClient } from "../../payment/src/payment-client";
-import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
+import { NETWORK } from "../../payment/test/ptbs/utils";
 import MerchantSlug from "@/components/merchant/merchantSlug";
-import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
-import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import ConnectWallet from "@/components/connectWallet";
+
 interface AccountDetailPageProps {
   address?: string;
 }
@@ -19,29 +17,25 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Get the address from the router if not provided as a prop
   const accountAddress = address || (router.query.address as string);
   const account = useCurrentAccount();
-
   const user = account?.address;
+
   useEffect(() => {
-    // Don't fetch until the router is ready and we have an address
-    if (!router.isReady || !accountAddress) return;
+    if (!router.isReady || !accountAddress || !user) return;
 
     fetchAccountDetails();
-  }, [router.isReady, accountAddress]);
+  }, [router.isReady, accountAddress, user]);
 
   const fetchAccountDetails = async () => {
     setIsLoading(true);
     setError("");
 
     try {
-      // First try to get the account from localStorage (if available)
       const storedAccount = localStorage.getItem("currentPaymentAccount");
+
       if (storedAccount) {
         const parsedAccount = JSON.parse(storedAccount);
-
-        // Check if this is the correct account (matching address)
         if (
           parsedAccount.address === accountAddress ||
           parsedAccount.id === accountAddress
@@ -52,14 +46,12 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
         }
       }
 
-      // If not found in localStorage or doesn't match, fetch from API
+      console.log("Initializing PaymentClient with user:", user);
       const paymentClient = await PaymentClient.init(NETWORK, user);
 
-      // Get all accounts and find the one matching the address
       const userAccounts = paymentClient.getUserPaymentAccounts();
       const matchingAccount = userAccounts.find(
-        (account) =>
-          account.id === accountAddress || account.id === accountAddress
+        (acc) => acc.id === accountAddress || acc.address === accountAddress
       );
 
       if (matchingAccount) {
@@ -81,6 +73,10 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
   const handleGoBack = () => {
     router.push("/merchant");
   };
+
+  if (!user) {
+    return <ConnectWallet />;
+  }
 
   if (isLoading) {
     return (
@@ -119,7 +115,7 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
           <meta name="description" content="Payment account details" />
         </Head>
 
-        <main className="max-w-3xl mx-auto">
+        <main className="max-w-5xl mx-auto">
           <div className="mb-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold">Account Details</h1>
             <button
@@ -149,23 +145,6 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
                     )}
                   </div>
                 </div>
-
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">Account Details</h3>
-                  <pre className="bg-gray-800 p-4 rounded overflow-auto max-h-96">
-                    {JSON.stringify(accountDetails, null, 2)}
-                  </pre>
-                </div>
-
-                {/* Additional account actions can be added here */}
-                <div className="grid grid-cols-2 gap-4">
-                  <button className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700">
-                    View Transactions
-                  </button>
-                  <button className="py-2 px-4 bg-purple-600 text-white rounded hover:bg-purple-700">
-                    Account Settings
-                  </button>
-                </div>
               </>
             ) : (
               <p>No account details available</p>
@@ -177,14 +156,11 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
   );
 };
 
-// You can also use getServerSideProps to fetch the account data server-side
 export async function getServerSideProps({
   params,
 }: {
   params: { address: string };
 }) {
-  // If you want to pre-fetch the data server-side, you can do so here
-  // For client-side only rendering, just return the address
   return {
     props: {
       address: params.address,
@@ -193,15 +169,3 @@ export async function getServerSideProps({
 }
 
 export default AccountDetailPage;
-
-// Use getServerSideProps instead of getStaticPaths/getStaticProps
-// export async function getServerSideProps({ params }) {
-//     // The ID is passed as a parameter
-//     const { id } = params;
-
-//     return {
-//       props: {
-//         id, // Pass the ID to the component as a prop
-//       },
-//     };
-//   }

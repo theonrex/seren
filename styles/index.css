@@ -1,0 +1,162 @@
+/* Root layout */
+.wallet-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 1rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000, #000817);
+  font-family: "Inter", sans-serif;
+}
+
+/* Max width constraint */
+.max-w-4xl {
+  max-width: 64rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Glass-style card */
+.glass-panel {
+  background: rgba(0, 36, 42, 0.65);
+  backdrop-filter: blur(14px);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  margin: 1em 0;
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+}
+
+/* Text styles */
+.subtitle {
+  font-size: 0.95rem;
+  color: #ffffff;
+  margin-bottom: 0.4rem;
+}
+
+.total-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.token-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.token-value {
+  font-size: 1rem;
+  color: #a5a5a7;
+}
+
+.wallet-address {
+  word-break: break-all;
+  color: #9e9e9e;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Grid styles (mobile-first) */
+.grid-2,
+.grid-3,
+.grid-4 {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+/* Medium screens (≥ 640px) */
+@media (min-width: 640px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .glass-panel {
+    padding: 2rem;
+  }
+
+  .total-value {
+    font-size: 2.5rem;
+  }
+
+  .token-name {
+    font-size: 1.75rem;
+  }
+}
+
+/* Large screens (≥ 1024px) */
+@media (min-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Icon box styles */
+.icon-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .icon-box {
+    padding: 1.5rem;
+  }
+}
+
+.icon-box svg {
+  font-size: 1.8rem;
+  margin-bottom: 0.6rem;
+  color: #16c4f9;
+}
+
+.icon-box:hover {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+/* Payment icon specific color */
+.icon-box:nth-child(4) svg {
+  color: #3b82f6;
+}
+
+/* Spinner loader */
+.animate-spin {
+  border-top-color: #f97316;
+  border-bottom-color: #f97316;
+  border-radius: 9999px;
+  animation: spin 1s linear infinite;
+  height: 3rem;
+  width: 3rem;
+  border-width: 4px;
+  border-style: solid;
+}
+
+/* Spin animation keyframes */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

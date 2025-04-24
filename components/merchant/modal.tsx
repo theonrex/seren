@@ -1,6 +1,5 @@
-"use client";
-
-import React, { useState } from "react";
+import { db, storage } from "@/firebase"; // Import Firebase utils
+import { useEffect, useState } from "react";
 import {
   Button,
   Modal,
@@ -13,7 +12,8 @@ import {
 } from "flowbite-react";
 import { FaArrowUp, FaQrcode, FaLink } from "react-icons/fa";
 import QRCode from "react-qr-code";
-
+import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // Sui SDKs
 import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
@@ -24,7 +24,6 @@ import {
 } from "@mysten/dapp-kit";
 
 export default function IssuePaymentModal({ merchantAddress }) {
-  console.log("merchantAddress", merchantAddress);
   const [openModal, setOpenModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [coinType, setCoinType] = useState("SUI");
@@ -52,11 +51,9 @@ export default function IssuePaymentModal({ merchantAddress }) {
     setIsIssuing(true);
     try {
       const tx = new Transaction();
-      // tx.setGasBudget(1000000000);
-
       const paymentClient = await PaymentClient.init(
         NETWORK,
-        account.address,
+        account?.address,
         merchantAddress
       );
 
@@ -80,10 +77,29 @@ export default function IssuePaymentModal({ merchantAddress }) {
         },
         {
           onSuccess: (result) => {
-            console.log("Transaction result:", result);
+            // Log the transaction result
+            console.log("Transaction Digest:", result.digest);
+            console.log("Transaction Signature:", result.signature);
+
             const data = result?.events?.[0]?.parsedJson;
             const newPaymentId = data?.payment_id ?? "";
-            setPaymentId(newPaymentId);
+            console.log("Parsed Event Data:", result);
+            console.log("New Payment ID:", newPaymentId);
+
+            // Log raw effects (you can customize based on your needs)
+            console.log("Raw Transaction Effects:", result.rawEffects);
+
+            // Log the transaction bytes (not human-readable, but for reference)
+            console.log("Raw Transaction Bytes:", result.bytes);
+
+            // Store the payment data in Firebase
+            addPaymentToFirebase({
+              paymentId: newPaymentId,
+              description,
+              amount: paymentAmount,
+              coinType,
+              merchantAddress,
+            });
           },
           onError: (err) => {
             console.error("Payment failed", err);
@@ -99,16 +115,27 @@ export default function IssuePaymentModal({ merchantAddress }) {
     }
   };
 
+  // Function to save the payment details to Firebase
+  const addPaymentToFirebase = async (paymentData) => {
+    try {
+      await addDoc(collection(db, "payments"), paymentData);
+      console.log("Payment data successfully saved to Firebase!");
+    } catch (error) {
+      console.error("Error saving data to Firebase:", error);
+    }
+  };
+
   return (
     <div>
       <div
         onClick={openPaymentModal}
-        className={`bg-gray-800 p-4 rounded-xl transition cursor-pointer ${
-          isIssuing ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-700"
-        }`}
+        // className={`bg-gray-800 p-4 rounded-xl transition cursor-pointer ${
+        //   isIssuing ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-700"
+        // }`}
       >
-        <FaArrowUp className="text-2xl mx-auto mb-2" />
-        <span className="text-sm">
+        <FaArrowUp className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
+        <span className="text-xs sm:text-sm">
+          {" "}
           {isIssuing ? "Issuing..." : "Issue Payment"}
         </span>
       </div>

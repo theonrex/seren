@@ -1,18 +1,13 @@
 import { useState, useEffect } from "react";
-import { getSuiVisionAccountUrl } from "@/lib/hooks/sui";
-import { AUTH_API_BASE, LOGIN_PAGE_PATH } from "@shinami/nextjs-zklogin";
-import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
-import Link from "next/link";
-import styles from "../../styles/index.module.css";
-import { suiPayImg, gradinetImg } from "@/images";
-import Image from "next/image";
-import Balance from "@/components/Balance";
-import { getZkLoginWalletAddress } from "@/utils/getZkLoginAddress";
-import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
-import { PaymentClient } from "../../payment/src/payment-client";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
+import { PaymentClient } from "../../payment/src/payment-client";
+import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
+import Image from "next/image";
+import ConnectWallet from "@/components/connectWallet";
 
+// Define interface for payment accounts
 interface PaymentAccount {
   id: string;
   name: string;
@@ -21,24 +16,22 @@ interface PaymentAccount {
 export default function Index() {
   const router = useRouter();
   const account = useCurrentAccount();
-
   const user = account?.address;
-
   const isLoading = !account?.address;
 
-  // const { user, isLoading } = useZkLoginSession();
-  const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [currentAccount, setCurrentAccount] = useState<any>(null);
-  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
-  const [userProfile, setUserProfile] = useState<any>("");
-
-  // console.log("userProfile", userProfile);
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [userProfile, setUserProfile] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("name");
 
   useEffect(() => {
-    fetchUserAccounts();
+    if (user) {
+      fetchUserAccounts();
+    }
   }, [user]);
 
   const fetchUserAccounts = async () => {
@@ -55,7 +48,7 @@ export default function Index() {
       if (userAccounts.length > 0) {
         setMessage(`✅ Found ${userAccounts.length} payment account(s).`);
       } else {
-        setMessage(`🚫 No payment accounts found. Please go to the `);
+        setMessage(`🚫 No payment accounts found. Please create one.`);
       }
     } catch (err) {
       console.error(err);
@@ -65,9 +58,7 @@ export default function Index() {
     }
   };
 
-  // In your Index component, modify the handleSelectAccount function
-
-  const handleSelectAccount = async (e: React.FormEvent) => {
+  const handleSelectAccount = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -84,198 +75,176 @@ export default function Index() {
 
       await paymentClient.switchAccount(selectedAccountId);
       const merchantAddress = paymentClient.paymentAccount;
-      console.log("merchantAddres smerchantAddress", merchantAddress);
 
-      // Get the account address from the account details
-      const accountAddress = merchantAddress.id || selectedAccountId;
-
-      // Instead of storing the entire account object, only store necessary properties
-      // Extract only the data you need to persist
+      // Store minimal account info
       const accountToStore = {
         id: merchantAddress.id,
       };
 
-      // Store the simplified object
       localStorage.setItem(
         "currentPaymentAccount",
         JSON.stringify(accountToStore)
       );
 
-      // Redirect to the account detail page with the address as the slug
-      router.push(`/merchant/${accountAddress}`);
+      router.push(`/merchant/${merchantAddress.id}`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load payment account"
       );
-      console.error(err);
-      setLoading(false);
-    }
-  };
-
-  // Find account by name
-  const findAccountByName = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const shopNameInput = (
-      document.getElementById("shopName") as HTMLInputElement
-    ).value;
-
-    try {
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        testKeypair.toSuiAddress()
-      );
-
-      const userAccounts = paymentClient.getUserPaymentAccounts();
-      const account = userAccounts.find((a) => a.name === shopNameInput);
-
-      if (account) {
-        setSelectedAccountId(account.id);
-        setMessage(`Found account: ${shopNameInput}`);
-      } else {
-        setMessage(`No account found with name: ${shopNameInput}`);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to find account");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!user) return <p>Loading... Please Connect Your Wallet.</p>;
+  const findAccountByName = (e) => {
+    e.preventDefault();
+    setSearchQuery(e.target.value);
+  };
 
-  console.log("accounts", accounts);
+  // Filter and sort accounts
+  const filteredAccounts = accounts.filter(
+    (account) =>
+      account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      account.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  if (user) {
-    return (
-      <div className="container mx-auto max-w-screen-xl">
-        {/* <h1>
-          Hello,{" "}
-          {user
-            ? `${user.wallet.slice(0, 6)}...${user.wallet.slice(-6)}`
-            : "Not logged in"}
-        </h1> */}
+  const sortedAccounts = [...filteredAccounts].sort((a, b) => {
+    if (sortOption === "name") {
+      return a.name.localeCompare(b.name);
+    } else if (sortOption === "id") {
+      return a.id.localeCompare(b.id);
+    }
+    return 0;
+  });
 
-        {message && (
-          <div className="mb-4 p-3 text-white rounded">
-            {accounts.length > 0 ? (
-              <div className="max-w-md mx-auto mt-8 p-6 bg-black text-white rounded shadow">
-                <h2 className="text-xl font-semibold mb-4">
-                  Get Payment Account
-                </h2>
+  // Truncate address for display
+  const truncateAddress = (address) => {
+    if (!address) return "";
+    return `${address.substring(0, 6)}...${address.substring(
+      address.length - 4
+    )}`;
+  };
 
-                {message && (
-                  <div className="mb-4 p-3 bg-green-900 text-green-300 rounded">
-                    {message}
-                  </div>
-                )}
+  if (!user) {
+    return <ConnectWallet />;
+  }
 
-                {error && (
-                  <div className="mb-4 p-3 bg-red-900 text-red-300 rounded">
-                    {error}
-                  </div>
-                )}
+  return (
+    <div className="min-h-screen bg-black text-sky-400 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Merchant Accounts</h1>
+          <p className="text-sky-300 mt-2 md:mt-0">
+            Connected: {truncateAddress(user)}
+          </p>
+        </div>
 
-                {/* Find account by name */}
-                <form onSubmit={findAccountByName} className="mb-6">
-                  <div className="mb-4">
-                    <label
-                      htmlFor="shopName"
-                      className="block mb-2 font-medium"
-                    >
-                      Shop Name
-                    </label>
-                    <input
-                      type="text"
-                      id="shopName"
-                      className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-                      required
-                    />
-                  </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-400"></div>
+          </div>
+        ) : accounts.length > 0 ? (
+          <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold mb-4 md:mb-0">
+                Your Payment Accounts
+              </h2>
+              <Link href="/merchant/create">
+                <span className="px-4 py-2 bg-sky-600 hover:bg-sky-700 transition-colors text-white rounded-lg">
+                  Create New Account
+                </span>
+              </Link>
+            </div>
 
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
-                  >
-                    {isLoading ? "Searching..." : "Find Account by Name"}
-                  </button>
-                </form>
-
-                {/* Account selection form */}
-                <form onSubmit={handleSelectAccount}>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="accountSelect"
-                      className="block mb-2 font-medium"
-                    >
-                      Select Account
-                    </label>
-                    <select
-                      id="accountSelect"
-                      value={selectedAccountId}
-                      onChange={(e) => setSelectedAccountId(e.target.value)}
-                      className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
-                      disabled={accounts.length === 0 || isLoading}
-                    >
-                      <option value="">Select an account</option>
-                      {accounts.map((account) => (
-                        <option key={account.id} value={account.id}>
-                          {account.name} ({account.id})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !selectedAccountId}
-                    className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
-                  >
-                    {isLoading ? "Loading..." : "Load Account"}
-                  </button>
-                </form>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+              <div className="relative w-full md:w-1/2 mb-4 md:mb-0">
+                <input
+                  type="text"
+                  placeholder="Search by name or address..."
+                  value={searchQuery}
+                  onChange={findAccountByName}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sky-300 placeholder-gray-500"
+                />
               </div>
-            ) : (
-              <p>
-                🚫 No payment accounts found. Please go to the{" "}
-                <Link
-                  href="/merchant/create"
-                  className="underline text-blue-400"
+
+              <div className="w-full md:w-1/4 md:ml-4">
+                <select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sky-300"
                 >
-                  Create Merchant
-                </Link>{" "}
-                to create one.
-              </p>
-            )}
+                  <option value="name">Sort by Name</option>
+                  <option value="id">Sort by Address</option>
+                </select>
+              </div>
+            </div>
+
+            <form onSubmit={handleSelectAccount}>
+              <div className="grid gap-4">
+                {sortedAccounts.map((account) => (
+                  <label
+                    key={account.id}
+                    className={`flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-colors ${
+                      selectedAccountId === account.id
+                        ? "bg-sky-900 border-sky-600"
+                        : "bg-gray-800 hover:bg-gray-700"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="accountSelect"
+                      value={account.id}
+                      checked={selectedAccountId === account.id}
+                      onChange={() => setSelectedAccountId(account.id)}
+                      className="h-5 w-5 text-sky-500"
+                    />
+                    <div className="ml-4 flex-1">
+                      <h3 className="font-medium text-lg">{account.name}</h3>
+                      <p className="text-gray-400 text-sm font-mono">
+                        {truncateAddress(account.id)}
+                      </p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {error && (
+                <div className="mt-4 p-3 bg-red-900/50 border border-red-800 text-red-300 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  disabled={loading || !selectedAccountId}
+                  className="w-full py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:bg-gray-700 disabled:text-gray-400 transition-colors font-medium"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="animate-spin h-5 w-5 border-t-2 border-b-2 border-white rounded-full mr-2"></span>
+                      Loading...
+                    </span>
+                  ) : (
+                    "Load Selected Account"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          <div className="bg-gray-900 rounded-lg border border-gray-800 p-8 text-center">
+            <div className="text-5xl mb-4">🚫</div>
+            <p className="text-xl mb-6">No payment accounts found.</p>
+            <Link href="/merchant/create">
+              <span className="px-6 py-3 bg-sky-600 hover:bg-sky-700 transition-colors text-white rounded-lg font-medium">
+                Create Your First Account
+              </span>
+            </Link>
           </div>
         )}
-
-        <div>
-          <Link href={`${AUTH_API_BASE}/logout`}>Sign out</Link>
-        </div>
       </div>
-    );
-  } else {
-    return (
-      <div className={styles.main}>
-        <div className={styles.suiDiv}>
-          <div className={styles.suiPay}>
-            <Image src={suiPayImg} width={600} height={600} alt="suiPayImg" />
-            <h1>SuiPay</h1>
-          </div>
-          <div>
-            <Link href={LOGIN_PAGE_PATH}>Sign in</Link>
-          </div>
-        </div>
-        <div className={styles.gradinetImg}>
-          <p>Powered by account.tech</p>
-          <Image src={gradinetImg} width={600} height={600} alt="gradinetImg" />
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
