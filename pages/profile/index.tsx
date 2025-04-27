@@ -11,23 +11,26 @@ import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import ProfilePage from "@/components/Profile/profilePage";
 import { ConnectButton } from "@mysten/dapp-kit";
 import ConnectWallet from "@/components/connectWallet";
+
+interface AccountPreview {
+  address: string;
+  balance: number;
+}
 export default function Profile() {
   const currentAccount = useCurrentAccount();
   const account = useCurrentAccount();
-
-
 
   const user = account?.address;
   const { mutate: signAndExecuteTransactionBlock } =
     useSignAndExecuteTransaction();
   const suiClient = useSuiClient();
 
-  const [paymentAccount, setPaymentAccount] = useState(null);
+  const [paymentAccount, setPaymentAccount] = useState<any>("");
   const [ownedObjects, setOwnedObjects] = useState(null);
   const [loading, setLoading] = useState(false);
   const [paymentsConfig, setPaymentsConfig] = useState(null);
   const [paymentNames, setPaymentNames] = useState(null);
-  const [userProfileInfo, setUserProileInfo] = useState(null);
+  const [userProfileInfo, setUserProileInfo] = useState<any[]>([]);
 
   //   console.log("testKeypair", testKeypair.toSuiAddress());
   //   console.log("user", user);
@@ -47,7 +50,7 @@ export default function Profile() {
         const paymentClient = await PaymentClient.init(NETWORK, user);
         // Get all user accounts and switch
         const userAccounts = paymentClient.getUserPaymentAccounts();
-   
+
         const userProfile = paymentClient.getUserProfile();
 
         // setPaymentsConfig(paymentConfig);

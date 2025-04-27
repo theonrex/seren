@@ -23,11 +23,11 @@ import {
   useCurrentAccount,
 } from "@mysten/dapp-kit";
 
-export default function IssuePaymentModal({ merchantAddress }) {
+export default function IssuePaymentModal({ merchantAddress }: any) {
   const [openModal, setOpenModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
-  const [coinType, setCoinType] = useState("SUI");
-  const [description, setDescription] = useState("");
+  const [coinType, setCoinType] = useState<string>("SUI");
+  const [description, setDescription] = useState<any>("");
   const [isIssuing, setIsIssuing] = useState(false);
   const [paymentId, setPaymentId] = useState("");
 
@@ -72,8 +72,8 @@ export default function IssuePaymentModal({ merchantAddress }) {
 
       signAndExecuteTransaction(
         {
-          transaction: tx,
-          chain: "sui:testnet", // or your preferred chain
+          transaction: await tx.toJSON(),
+          chain: "sui:testnet",
         },
         {
           onSuccess: (result) => {
@@ -81,20 +81,20 @@ export default function IssuePaymentModal({ merchantAddress }) {
             console.log("Transaction Digest:", result.digest);
             console.log("Transaction Signature:", result.signature);
 
-            const data = result?.events?.[0]?.parsedJson;
-            const newPaymentId = data?.payment_id ?? "";
-            console.log("Parsed Event Data:", result);
-            console.log("New Payment ID:", newPaymentId);
+            // const data = result?.events?.[0]?.parsedJson;
+            // const newPaymentId = data?.payment_id ?? "";
+            // console.log("Parsed Event Data:", result);
+            // console.log("New Payment ID:", newPaymentId);
 
             // Log raw effects (you can customize based on your needs)
-            console.log("Raw Transaction Effects:", result.rawEffects);
+            // console.log("Raw Transaction Effects:", result.rawEffects);
 
             // Log the transaction bytes (not human-readable, but for reference)
             console.log("Raw Transaction Bytes:", result.bytes);
 
             // Store the payment data in Firebase
             addPaymentToFirebase({
-              paymentId: newPaymentId,
+              // paymentId: newPaymentId,
               description,
               amount: paymentAmount,
               coinType,
@@ -116,7 +116,7 @@ export default function IssuePaymentModal({ merchantAddress }) {
   };
 
   // Function to save the payment details to Firebase
-  const addPaymentToFirebase = async (paymentData) => {
+  const addPaymentToFirebase = async ({ paymentData }: any) => {
     try {
       await addDoc(collection(db, "payments"), paymentData);
       console.log("Payment data successfully saved to Firebase!");
@@ -150,7 +150,7 @@ export default function IssuePaymentModal({ merchantAddress }) {
         <ModalBody>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="description" value="Payment Description" />
+              <Label htmlFor="description">Payment Description</Label>
               <TextInput
                 id="description"
                 value={description}
@@ -161,7 +161,7 @@ export default function IssuePaymentModal({ merchantAddress }) {
             </div>
 
             <div>
-              <Label htmlFor="coinType" value="Coin Type" />
+              <Label htmlFor="coinType">Coin Type</Label>
               <Select
                 id="coinType"
                 value={coinType}
@@ -174,7 +174,6 @@ export default function IssuePaymentModal({ merchantAddress }) {
             </div>
 
             <div>
-              <Label htmlFor="amount" value="Amount" />
               <TextInput
                 id="amount"
                 type="number"
@@ -188,7 +187,7 @@ export default function IssuePaymentModal({ merchantAddress }) {
 
             {paymentId && (
               <div className="mt-4">
-                <Label value="Payment ID" />
+                <Label htmlFor="Payment ID">Payment ID </Label>
                 <div className="flex items-center space-x-2">
                   <span>{paymentId}</span>
                   <FaLink

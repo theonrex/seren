@@ -15,7 +15,8 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@mysten/sui": ["./node_modules/@mysten/sui"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next.config.js"],

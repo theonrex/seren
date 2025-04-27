@@ -13,7 +13,7 @@ import {
 import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
-
+import { useSuiClient } from "@mysten/dapp-kit";
 export default function Payment() {
   const [openModal, setOpenModal] = useState(false);
   const [tip, setTip] = useState("0");
@@ -21,13 +21,14 @@ export default function Payment() {
   const [merchantAccount, setMerchantAccount] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [url, setUrl] = useState(""); // New state for storing the pasted URL
+  const client = useSuiClient();
 
   const account = useCurrentAccount();
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction();
 
   // Function to extract merchantaccount and paymentId from the URL
-  const handleUrlChange = (e) => {
+  const handleUrlChange = (e: any) => {
     setUrl(e.target.value); // Update URL state
     const urlParams = new URLSearchParams(new URL(e.target.value).search);
     const extractedMerchantAccount = urlParams.get("merchantaccount");
@@ -42,10 +43,10 @@ export default function Payment() {
   };
 
   const handlePayment = async () => {
-    console.log("📝 Payment attempt initiated");
-    console.log("📦 Payment ID:", paymentId);
-    console.log("💸 Tip (MIST):", tip);
-    console.log("💼 Merchant Account:", merchantAccount);
+    // console.log("📝 Payment attempt initiated");
+    // console.log("📦 Payment ID:", paymentId);
+    // console.log("💸 Tip (MIST):", tip);
+    // console.log("💼 Merchant Account:", merchantAccount);
 
     if (!paymentId || !tip || !merchantAccount) {
       setStatus(
@@ -75,24 +76,31 @@ export default function Payment() {
       await paymentClient.makePayment(tx, paymentId, BigInt(tip));
 
       const result = await signAndExecuteTransaction({
-        transaction: tx,
+        transaction: await tx.toJSON(),
         chain: "sui:testnet", // or "sui:mainnet"
+      });
+
+      const transactionBlock = await client.getTransactionBlock({
+        digest: result.digest,
         options: {
           showEffects: true,
           showEvents: true,
         },
       });
 
-      const status = result.effects?.status;
+      // Now you can safely access status!
+      const status = transactionBlock.effects?.status;
+      const txStatus = transactionBlock.effects?.status?.status;
+      // const status = result.effects?.status;
       console.log("status", status);
-      if (status !== "success") {
-        console.error(result.effects?.status.error);
+      if (txStatus !== "success") {
+        // console.error(result.effects?.status.status.error);
         setStatus("❌ Payment failed.");
         return;
       }
 
-      const data = result.events?.[0]?.parsedJson as any;
-      console.log("✅ Payment Success:", data);
+      const data = transactionBlock.events?.[0]?.parsedJson as any;
+      console.log("First event data:", data); // console.log("✅ Payment Success:", data);
       setStatus(`✅ Paid ${data.amount} with Tip ${data.tip}`);
     } catch (err) {
       console.error("❌ Payment Error:", err);
@@ -101,40 +109,37 @@ export default function Payment() {
   };
 
   return (
-    <div>
-      <div onClick={() => setOpenModal(true)}>Make Payment</div>
+    <div className="payment-container">
+      <div className="make-payment-btn">Make Payment</div>
 
-      <div>
-        <header>Make Payment</header>
-        <div>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-white">Paste Link</label>
-              <input
-                type="text"
-                value={url}
-                onChange={handleUrlChange} // Handle link change
-                className="w-full rounded bg-gray-700 text-white px-3 py-2"
-                placeholder="Paste the payment link here"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-white">Tip (in MIST)</label>
-              <input
-                type="number"
-                value={tip}
-                onChange={(e) => setTip(e.target.value)}
-                className="w-full rounded bg-gray-700 text-white px-3 py-2"
-                placeholder="Enter optional tip"
-              />
-            </div>
-            {status && (
-              <p className="mt-2 text-sm text-center text-gray-400">{status}</p>
-            )}
+      <div className="payment-form">
+        <div className="form-body">
+          <div className="input-group">
+            <label className="input-label">Paste Link</label>
+            <input
+              type="text"
+              value={url}
+              onChange={handleUrlChange} // Handle link change
+              className="input-field"
+              placeholder="Paste the payment link here"
+            />
           </div>
+          <div className="input-group">
+            <label className="input-label">Tip (in MIST)</label>
+            <input
+              type="number"
+              value={tip}
+              onChange={(e) => setTip(e.target.value)}
+              className="input-field"
+              placeholder="Enter optional tip"
+            />
+          </div>
+          {status && <p className="status-message">{status}</p>}
         </div>
-        <div>
-          <Button onClick={handlePayment}>Pay</Button>
+        <div className="pay-btn-container">
+          <Button onClick={handlePayment} className="pay-btn">
+            Pay
+          </Button>
         </div>
       </div>
     </div>

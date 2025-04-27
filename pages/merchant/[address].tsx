@@ -19,7 +19,7 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
 
   const accountAddress = address || (router.query.address as string);
   const account = useCurrentAccount();
-  const user = account?.address;
+  const user: string = account!.address;
 
   useEffect(() => {
     if (!router.isReady || !accountAddress || !user) return;
@@ -51,7 +51,7 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
 
       const userAccounts = paymentClient.getUserPaymentAccounts();
       const matchingAccount = userAccounts.find(
-        (acc) => acc.id === accountAddress || acc.address === accountAddress
+        (acc) => acc.id === accountAddress
       );
 
       if (matchingAccount) {

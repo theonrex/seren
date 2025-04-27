@@ -19,6 +19,8 @@ export default function UserProfileDetailSlug() {
   const { id } = router.query;
   const [copied, setCopied] = useState(false);
 
+  const userId = typeof id === "string" ? id : id?.[0] ?? "";
+
   // console.log("name", name);
   console.log("id", id);
 
@@ -29,8 +31,8 @@ export default function UserProfileDetailSlug() {
   const [paymentClient, setPaymentClient] = useState<PaymentClient | null>(
     null
   );
-  const [paymentAccount, setPaymentAccount] = useState(null);
-  const [ownedObjects, setOwnedObjects] = useState<any[]>([]);
+  const [paymentAccount, setPaymentAccount] = useState<any>(null);
+  const [ownedObjects, setOwnedObjects] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   console.log("ownedObjects", ownedObjects);
   console.log("paymentAccount", paymentAccount);
@@ -44,7 +46,7 @@ export default function UserProfileDetailSlug() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(user.id);
+    navigator.clipboard.writeText(userId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

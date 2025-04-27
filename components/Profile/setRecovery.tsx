@@ -16,29 +16,27 @@ export default function SetRecovery() {
   const { id } = router.query;
 
   const currentAccount = useCurrentAccount();
+  const user: string = currentAccount!.address;
+
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const [paymentClient, setPaymentClient] = useState<PaymentClient | null>(
     null
   );
-  const [paymentAccount, setPaymentAccount] = useState(null);
-  const [ownedObjects, setOwnedObjects] = useState<any[]>([]);
+  // const [paymentAccount, setPaymentAccount] = useState(null);
+  // const [ownedObjects, setOwnedObjects] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recoveryAddress, setRecoveryAddress] = useState("");
 
   useEffect(() => {
     const fetchPaymentData = async () => {
-      if (!currentAccount?.address) return;
+      if (!user) return;
 
       try {
         setLoading(true);
 
-        const client = await PaymentClient.init(
-          NETWORK,
-          currentAccount.address,
-          ACCOUNT
-        );
+        const client = await PaymentClient.init(NETWORK, user, ACCOUNT);
 
         const userAccounts = client.getUserPaymentAccounts();
         const accountId = userAccounts.find((a) => a.id === id)?.id;
@@ -48,10 +46,10 @@ export default function SetRecovery() {
         }
 
         setPaymentClient(client);
-        setPaymentAccount(client.paymentAccount);
+        // setPaymentAccount(client.paymentAccount);
 
-        const objects = await client.getOwnedObjects();
-        setOwnedObjects(objects);
+        const objects = client.getOwnedObjects();
+        // setOwnedObjects(objects);
       } catch (err) {
         console.error("Error loading payment data:", err);
       } finally {
@@ -68,16 +66,13 @@ export default function SetRecovery() {
 
     try {
       const tx = new Transaction();
+      const idString = Array.isArray(id) ? id[0] : id;
 
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        currentAccount.address,
-        id
-      );
+      const paymentClient = await PaymentClient.init(NETWORK, user, idString);
       paymentClient.setRecoveryAddress(tx, recoveryAddress);
 
-      const result = await signAndExecuteTransaction({
-        transaction: tx,
+      const result = signAndExecuteTransaction({
+        transaction: await tx.toJSON(),
         chain: "sui:testnet",
       });
       console.log("Recovery address set:", result);
@@ -96,8 +91,8 @@ export default function SetRecovery() {
   return (
     <div
       className="profile_div"
-    //   data-modal-target="static-modal"
-    //   data-modal-toggle="static-modal"
+      //   data-modal-target="static-modal"
+      //   data-modal-toggle="static-modal"
     >
       <span>Recovery Options</span>
 

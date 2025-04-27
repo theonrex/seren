@@ -14,12 +14,13 @@ import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import Link from "next/link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-export default function MerchantSlug({ merchantAddress }) {
+export default function MerchantSlug({ merchantAddress }: any) {
   const account = useCurrentAccount();
-  const user = account?.address;
-  const [balance, setBalance] = useState(null);
-  const [pendingPayments, setPendingPayments] = useState(null);
-  const [recentTransactions, setRecentTransactions] = useState([]);
+  const user: string = account!.address;
+
+  const [balance, setBalance] = useState<string>("0");
+  const [pendingPayments, setPendingPayments] = useState<any>(null);
+  const [recentTransactions, setRecentTransactions] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
@@ -72,7 +73,7 @@ export default function MerchantSlug({ merchantAddress }) {
   }, [merchantAddress]);
 
   // Helper function to format amount with proper decimals
-  const formatAmount = (amount) => {
+  const formatAmount = (amount: number) => {
     if (typeof amount === "bigint") {
       const amountInDecimal = Number(amount) / 1e9;
       return amountInDecimal.toFixed(4);
@@ -81,7 +82,7 @@ export default function MerchantSlug({ merchantAddress }) {
   };
 
   // Helper function to truncate address for display
-  const truncateAddress = (address, isMobile = false) => {
+  const truncateAddress = (address: string, isMobile = false) => {
     if (!address) return "";
     if (isMobile) {
       return `${address.substring(0, 6)}...${address.substring(
@@ -304,44 +305,52 @@ export default function MerchantSlug({ merchantAddress }) {
               </div>
             ) : recentTransactions.length > 0 ? (
               <div className="space-y-2 sm:space-y-3">
-                {recentTransactions.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="bg-gray-800 rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors"
-                  >
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div
-                        className={`p-1 sm:p-2 rounded-full ${
+                {recentTransactions.map(
+                  (tx: {
+                    id: React.Key | null | undefined;
+                    type: string;
+                    description: string | null | undefined;
+                    date: string | number | bigint | null | undefined;
+                    amount: string | number | bigint | null | undefined;
+                  }) => (
+                    <div
+                      key={tx.id}
+                      className="bg-gray-800 rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div
+                          className={`p-1 sm:p-2 rounded-full ${
+                            tx.type === "incoming"
+                              ? "bg-green-900/30"
+                              : "bg-red-900/30"
+                          }`}
+                        >
+                          {tx.type === "incoming" ? (
+                            <AiOutlinePlus className="text-green-400 text-sm sm:text-lg" />
+                          ) : (
+                            <FaArrowUp className="text-red-400 text-sm sm:text-lg" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">
+                            {tx.description}
+                          </p>
+                          <p className="text-xs text-gray-400">{tx.date}</p>
+                        </div>
+                      </div>
+                      <span
+                        className={`font-semibold text-sm sm:text-base ${
                           tx.type === "incoming"
-                            ? "bg-green-900/30"
-                            : "bg-red-900/30"
+                            ? "text-green-400"
+                            : "text-red-400"
                         }`}
                       >
-                        {tx.type === "incoming" ? (
-                          <AiOutlinePlus className="text-green-400 text-sm sm:text-lg" />
-                        ) : (
-                          <FaArrowUp className="text-red-400 text-sm sm:text-lg" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">
-                          {tx.description}
-                        </p>
-                        <p className="text-xs text-gray-400">{tx.date}</p>
-                      </div>
+                        {tx.type === "incoming" ? "+" : "-"}
+                        {tx.amount} SUI
+                      </span>
                     </div>
-                    <span
-                      className={`font-semibold text-sm sm:text-base ${
-                        tx.type === "incoming"
-                          ? "text-green-400"
-                          : "text-red-400"
-                      }`}
-                    >
-                      {tx.type === "incoming" ? "+" : "-"}
-                      {tx.amount} SUI
-                    </span>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             ) : (
               <div className="text-center py-6 sm:py-8 text-gray-400">

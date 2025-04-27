@@ -17,7 +17,7 @@ export async function makePayment(paymentId: string, tipAmount: bigint) {
   const tx = new Transaction();
   tx.setGasBudget(1000000000); // optional: handled by wallet if left unset
 
-  await paymentClient.makePayment(tx, paymentId, tipAmount);
+  paymentClient.makePayment(tx, paymentId, tipAmount);
 
   const result = await paymentClient.client.signAndExecuteTransaction({
     signer: testKeypair,

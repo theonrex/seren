@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useCurrentAccount, ConnectButton } from "@mysten/dapp-kit";
@@ -13,18 +13,24 @@ interface PaymentAccount {
   name: string;
 }
 
+type Profile = {
+  name: string;
+  email: string;
+  address: string;
+};
+
 export default function Index() {
   const router = useRouter();
   const account = useCurrentAccount();
-  const user = account?.address;
+  const user: string | any = account?.address;
   const isLoading = !account?.address;
 
-  const [accounts, setAccounts] = useState([]);
+  const [accounts, setAccounts] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [selectedAccountId, setSelectedAccountId] = useState("");
-  const [userProfile, setUserProfile] = useState(null);
+  const [userProfile, setUserProfile] = useState<Profile | any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name");
 
@@ -58,7 +64,7 @@ export default function Index() {
     }
   };
 
-  const handleSelectAccount = async (e) => {
+  const handleSelectAccount = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -97,14 +103,17 @@ export default function Index() {
     }
   };
 
-  const findAccountByName = (e) => {
+  const findAccountByName = (e: {
+    preventDefault: () => void;
+    target: { value: SetStateAction<string> };
+  }) => {
     e.preventDefault();
     setSearchQuery(e.target.value);
   };
 
   // Filter and sort accounts
   const filteredAccounts = accounts.filter(
-    (account) =>
+    (account: { name: string; id: string }) =>
       account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       account.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -119,7 +128,7 @@ export default function Index() {
   });
 
   // Truncate address for display
-  const truncateAddress = (address) => {
+  const truncateAddress = (address: string) => {
     if (!address) return "";
     return `${address.substring(0, 6)}...${address.substring(
       address.length - 4

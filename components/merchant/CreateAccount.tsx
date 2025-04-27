@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { getSuiBalance } from "@/utils/getBalance";
-import {
-  FaArrowDown,
-  FaArrowUp,
-  FaMoneyBillWave,
-  FaPaperPlane,
-} from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { AiOutlinePlus } from "react-icons/ai";
 import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
@@ -20,9 +14,13 @@ import { db, storage } from "@/firebase"; // Import Firebase utils
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+interface FileInterface {
+  name: string;
+}
+
 export default function MerchantSlug() {
   const account = useCurrentAccount();
-  const user = account?.address;
+  const user = account?.address || "";
   const [balance, setBalance] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
@@ -44,11 +42,7 @@ export default function MerchantSlug() {
     getSuiBalance(user).then(setBalance).catch(console.error);
   }, [user]);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleImageUpload = async (file) => {
+  const handleImageUpload = async (file: any) => {
     const storageRef = ref(storage, `profile_pictures/${file.name}`);
     const snapshot = await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(snapshot.ref);
@@ -76,14 +70,14 @@ export default function MerchantSlug() {
 
       signAndExecuteTransaction(
         {
-          transaction: tx,
+          transaction: await tx.toJSON(),
           chain: "sui:testnet",
         },
         {
           onSuccess: async (result) => {
             setDigest(result.digest);
             setMessage("Payment account created successfully");
-            console.log("Transaction result:", result);
+            // console.log("Transaction result:", result);
 
             // Store data in Firestore
             try {
@@ -132,25 +126,14 @@ export default function MerchantSlug() {
 
   return (
     <div className="min-h-screen container">
-      <Link href="/merchant">Merchant</Link>
+      <Link className="Merchant_link" href="/merchant">
+        <span>
+          {" "}
+          <FaArrowLeft />{" "}
+        </span>
+        Merchant
+      </Link>
       <div className="card">
-        {/* Wallet Address & Balance */}
-        <div className="card-header">
-          <div>
-            <p className="text-gray-400 text-sm mb-1">Wallet Address</p>
-            <p className="text-md font-mono bg-gray-800 p-2 rounded-lg inline-block break-words">
-              {user || "Not logged in"}
-            </p>
-          </div>
-        </div>
-
-        <div className="card-content">
-          <p className="text-gray-400 text-sm mb-1">Total Balance</p>
-          <h2 className="text-4xl font-bold">
-            {balance !== null ? `${balance} SUI` : "Loading..."}
-          </h2>
-        </div>
-
         {/* Create Payment Request */}
         <div className="card-content">
           <h2 className="text-xl font-bold mb-4">Create Payment Request</h2>

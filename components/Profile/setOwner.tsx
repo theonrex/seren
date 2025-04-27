@@ -17,28 +17,25 @@ export default function SetOwner() {
 
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+  const user: string = currentAccount!.address;
 
   const [paymentClient, setPaymentClient] = useState<PaymentClient | null>(
     null
   );
   const [paymentAccount, setPaymentAccount] = useState(null);
-  const [ownedObjects, setOwnedObjects] = useState<any[]>([]);
+  const [ownedObjects, setOwnedObjects] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ownerAddress, setOwnerAddress] = useState("");
 
   useEffect(() => {
     const fetchPaymentData = async () => {
-      if (!currentAccount?.address) return;
+      if (!user) return;
 
       try {
         setLoading(true);
 
-        const client = await PaymentClient.init(
-          NETWORK,
-          currentAccount.address,
-          ACCOUNT
-        );
+        const client = await PaymentClient.init(NETWORK, user, ACCOUNT);
 
         const userAccounts = client.getUserPaymentAccounts();
         const accountId = userAccounts.find((a) => a.id === id)?.id;
@@ -48,7 +45,7 @@ export default function SetOwner() {
         }
 
         setPaymentClient(client);
-        setPaymentAccount(client.paymentAccount);
+        // setPaymentAccount(client.paymentAccount);
 
         const objects = await client.getOwnedObjects();
         setOwnedObjects(objects);
@@ -68,16 +65,13 @@ export default function SetOwner() {
 
     try {
       const tx = new Transaction();
+      const idString = Array.isArray(id) ? id[0] : id;
 
-      const paymentClient = await PaymentClient.init(
-        NETWORK,
-        currentAccount.address,
-        id
-      );
+      const paymentClient = await PaymentClient.init(NETWORK, user, idString);
       paymentClient.setOwnerAddress(tx, ownerAddress);
 
       const result = await signAndExecuteTransaction({
-        transaction: tx,
+        transaction: await tx.toJSON(),
         chain: "sui:testnet",
       });
       console.log("Recovery address set:", result);

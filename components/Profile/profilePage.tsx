@@ -2,7 +2,15 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function ProfilePage({ paymentAccount, userProfileInfo }) {
+interface ProfilePageProps {
+  paymentAccount: any;
+  userProfileInfo: any;
+}
+
+export default function ProfilePage({
+  paymentAccount,
+  userProfileInfo,
+}: ProfilePageProps) {
   console.log("userProfileInfo", userProfileInfo);
   console.log("paymentAccount", paymentAccount);
   return (
@@ -35,18 +43,26 @@ export default function ProfilePage({ paymentAccount, userProfileInfo }) {
         <div className="">
           {!userProfileInfo ? (
             <div className="user-info-grid">
-              {userProfileInfo?.map((user, index) => (
-                <Link
-                  key={index}
-                  href={`/profile/${user.id}`}
-                  className="user-card-link"
-                >
-                  <div className="user-card">
-                    <p className="user-name">{user.name}</p>
-                    <p className="user-id">{user.id}</p>
-                  </div>
-                </Link>
-              ))}
+              {userProfileInfo?.map(
+                (
+                  user: {
+                    name: string;
+                    id: string | number;
+                  },
+                  index: React.Key | null | undefined
+                ) => (
+                  <Link
+                    key={index}
+                    href={`/profile/${user.id}`}
+                    className="user-card-link"
+                  >
+                    <div className="user-card">
+                      <p className="user-name">{user.name}</p>
+                      <p className="user-id">{user.id}</p>
+                    </div>
+                  </Link>
+                )
+              )}
             </div>
           ) : (
             <div className="Merchant_Link">
