@@ -15,6 +15,11 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <Head>
+        <meta
+          name="description"
+          content="Suipay - Your fast and secure payment solution."
+        />
+        <link rel="icon" href="/images/favicon.ico" />
         <ThemeModeScript />
         <link
           href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"

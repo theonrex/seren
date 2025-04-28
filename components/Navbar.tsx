@@ -4,11 +4,9 @@ import { suiPayImg } from "@/images";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import {
-  Avatar,
   Dropdown,
   DropdownDivider,
   DropdownHeader,
-  DropdownItem,
   Navbar,
   NavbarBrand,
   NavbarCollapse,
@@ -21,32 +19,42 @@ export default function NavbarBody() {
   const account = useCurrentAccount();
   const user = account?.address;
 
+  // Helper function to generate dark random colors
+  function getRandomDarkColor() {
+    const r = Math.floor(Math.random() * 100); // 0-99 for dark tones
+    const g = Math.floor(Math.random() * 100);
+    const b = Math.floor(Math.random() * 100);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
   return (
     <div className="nav_div">
-      <Navbar fluid rounded className="max-w-screen-xl  mx-auto p-4  nav_div">
+      <Navbar fluid rounded className="max-w-screen-xl mx-auto p-4 nav_div">
         <NavbarBrand href="/">
-          <Image src={suiPayImg} alt="SuIplay Logo" width={30} height={30} />
-
+          <Image src={suiPayImg} alt="SuiPlay Logo" width={30} height={30} />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             SuiPlay
           </span>
         </NavbarBrand>
+
         <div className="flex md:order-2">
           {user ? (
             <Dropdown
               arrowIcon={false}
               inline
               label={
-                <Avatar
-                  alt="User settings"
-                  img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                  rounded
-                />
+                <div
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-white font-bold"
+                  style={{
+                    backgroundColor: getRandomDarkColor(),
+                  }}
+                >
+                  {user.slice(0, 2).toUpperCase()}
+                </div>
               }
               className="Dropdown_Div"
             >
               <DropdownHeader>
-                {/* <span className="block text-sm">Bonnie Green</span> */}
                 <span className="block truncate text-sm font-medium">
                   {user.length > 6
                     ? `${user.slice(0, 4)}........${user.slice(-4)}`
@@ -54,20 +62,20 @@ export default function NavbarBody() {
                 </span>
               </DropdownHeader>
               <div className="Dropdown_Div_link">
-                {" "}
                 <Link href="/profile">Dashboard</Link>
               </div>
               <div className="Dropdown_Div_link">
                 <Link href="/profile">Settings</Link>
               </div>
               <DropdownDivider />
-              {/* <DropdownItem>Sign out</DropdownItem> */}
             </Dropdown>
           ) : (
             ""
           )}
+
           <NavbarToggle />
         </div>
+
         <NavbarCollapse className="navbar_collapse">
           <NavbarLink
             href="/"
@@ -75,154 +83,13 @@ export default function NavbarBody() {
           >
             Customer
           </NavbarLink>
-          <NavbarLink href="/merchant"> Merchant</NavbarLink>
+          <NavbarLink href="/merchant">Merchant</NavbarLink>
           <NavbarLink href="/faucet" target="_blank">
-            {" "}
             Claim Faucet
           </NavbarLink>
           <ConnectButton />
         </NavbarCollapse>
       </Navbar>
-      {/* <nav className="bg-white border-gray-200 dark:bg-gray-900">
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a
-            href="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
-            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              SuiPlay
-            </span>
-          </a>
-          <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-            <button
-              type="button"
-              className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-              id="user-menu-button"
-              aria-expanded="false"
-              data-dropdown-toggle="user-dropdown"
-              data-dropdown-placement="bottom"
-            >
-              <span className="sr-only">Open user menu</span>
-              <img
-                className="w-8 h-8 rounded-full"
-                src="/docs/images/people/profile-picture-3.jpg"
-                alt="user photo"
-              />
-            </button>
-            {user ? (
-              <div>
-                {" "}
-                <div
-                  className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600"
-                  id="user-dropdown"
-                >
-                  <div className="px-4 py-3">
-                    <span className="block text-sm text-gray-900 dark:text-white">
-                      Bonnie Green
-                    </span>
-                  </div>
-                  <ul className="py-2" aria-labelledby="user-menu-button">
-                    <li>
-                      <a
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Profile
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Settings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Earnings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Sign out
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <button
-                  data-collapse-toggle="navbar-user"
-                  type="button"
-                  className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                  aria-controls="navbar-user"
-                  aria-expanded="false"
-                >
-                  <span className="sr-only">Open main menu</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 17 14"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M1 1h15M1 7h15M1 13h15"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
-
-          <div className="hidden w-full md:block md:w-auto" id="navbar-user">
-            <ul className="font-medium flex nav_ul flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-              <li>
-                <a
-                  href="/"
-                  className="block py-2 px-3 text-white rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-                  aria-current="page"
-                >
-                  Customer
-                </a>
-              </li>{" "}
-              <li>
-                <a
-                  href="/merchant"
-                  className="block py-2 px-3 text-white rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-                  aria-current="page"
-                >
-                  Merchant
-                </a>
-              </li>{" "}
-              <li>
-                <a
-                  href="/faucet"
-                  target="_blank"
-                  className="block py-2 px-3 text-white  rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-                  aria-current="page"
-                >
-                  Claim Faucet
-                </a>
-              </li>
-              <li>
-                <ConnectButton />
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav> */}
     </div>
   );
 }

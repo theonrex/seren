@@ -35,7 +35,7 @@ export default function PendingPayments({
               const account = payment.fields?.account;
               const paymentKey = payment.fields?.key;
 
-              const linkToCopy = `http://localhost:3000/makepayment?account=${account}&key=${paymentKey}`;
+              const linkToCopy = `https://suipay-two.vercel.app/makepayment?account=${account}&key=${paymentKey}`;
 
               return (
                 <div
