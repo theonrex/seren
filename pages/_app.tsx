@@ -10,6 +10,7 @@ import "../styles/nav.css";
 import "../styles/merchant.css";
 import "../styles/index.css";
 import "@mysten/dapp-kit/dist/index.css";
+// import "../styles/input.css";
 
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
@@ -24,6 +25,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   };
   return (
     <QueryClientProvider client={queryClient}>
+      <link
+        href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"
+        rel="stylesheet"
+      />
+
       {/* <ZkLoginSessionProvider>
         {" "}
         <SuiClientProvider> */}

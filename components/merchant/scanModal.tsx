@@ -8,7 +8,7 @@ import {
 } from "flowbite-react";
 import QRCode from "react-qr-code";
 import { FaArrowUp } from "react-icons/fa";
-
+import { FaQrcode } from "react-icons/fa";
 export default function ScanModal({ link }: any) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -19,8 +19,8 @@ export default function ScanModal({ link }: any) {
   return (
     <div>
       <div onClick={openPaymentModal}>
-        <FaArrowUp className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
-        <span className="text-xs sm:text-sm">Scan to pay</span>
+        <FaQrcode className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
+        {/* <span className="text-xs sm:text-sm"></span> */}
       </div>
 
       <Modal

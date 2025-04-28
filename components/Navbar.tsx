@@ -3,19 +3,92 @@ import Image from "next/image";
 import { suiPayImg } from "@/images";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-export default function Navbar() {
+import {
+  Avatar,
+  Dropdown,
+  DropdownDivider,
+  DropdownHeader,
+  DropdownItem,
+  Navbar,
+  NavbarBrand,
+  NavbarCollapse,
+  NavbarLink,
+  NavbarToggle,
+} from "flowbite-react";
+import Link from "next/link";
+
+export default function NavbarBody() {
   const account = useCurrentAccount();
   const user = account?.address;
 
   return (
-    <div>
-      <nav className="bg-white border-gray-200 dark:bg-gray-900">
+    <div className="nav_div">
+      <Navbar fluid rounded className="max-w-screen-xl  mx-auto p-4  nav_div">
+        <NavbarBrand href="/">
+          <Image src={suiPayImg} alt="SuIplay Logo" width={30} height={30} />
+
+          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+            SuiPlay
+          </span>
+        </NavbarBrand>
+        <div className="flex md:order-2">
+          {user ? (
+            <Dropdown
+              arrowIcon={false}
+              inline
+              label={
+                <Avatar
+                  alt="User settings"
+                  img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                  rounded
+                />
+              }
+              className="Dropdown_Div"
+            >
+              <DropdownHeader>
+                {/* <span className="block text-sm">Bonnie Green</span> */}
+                <span className="block truncate text-sm font-medium">
+                  {user.length > 6
+                    ? `${user.slice(0, 4)}........${user.slice(-4)}`
+                    : user}
+                </span>
+              </DropdownHeader>
+              <div className="Dropdown_Div_link">
+                {" "}
+                <Link href="/profile">Dashboard</Link>
+              </div>
+              <div className="Dropdown_Div_link">
+                <Link href="/profile">Settings</Link>
+              </div>
+              <DropdownDivider />
+              {/* <DropdownItem>Sign out</DropdownItem> */}
+            </Dropdown>
+          ) : (
+            ""
+          )}
+          <NavbarToggle />
+        </div>
+        <NavbarCollapse className="navbar_collapse">
+          <NavbarLink
+            href="/"
+            className="block py-2 px-3 text-white rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+          >
+            Customer
+          </NavbarLink>
+          <NavbarLink href="/merchant"> Merchant</NavbarLink>
+          <NavbarLink href="/faucet" target="_blank">
+            {" "}
+            Claim Faucet
+          </NavbarLink>
+          <ConnectButton />
+        </NavbarCollapse>
+      </Navbar>
+      {/* <nav className="bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <a
             href="/"
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
-            <Image src={suiPayImg} alt="SuIplay Logo" width={30} height={30} />
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
               SuiPlay
             </span>
@@ -36,7 +109,6 @@ export default function Navbar() {
                 alt="user photo"
               />
             </button>
-            {/* Dropdown menu */}
             {user ? (
               <div>
                 {" "}
@@ -47,9 +119,6 @@ export default function Navbar() {
                   <div className="px-4 py-3">
                     <span className="block text-sm text-gray-900 dark:text-white">
                       Bonnie Green
-                    </span>
-                    <span className="block text-sm  text-gray-500 truncate dark:text-gray-400">
-                      name@flowbite.com
                     </span>
                   </div>
                   <ul className="py-2" aria-labelledby="user-menu-button">
@@ -153,7 +222,7 @@ export default function Navbar() {
             </ul>
           </div>
         </div>
-      </nav>
+      </nav> */}
     </div>
   );
 }

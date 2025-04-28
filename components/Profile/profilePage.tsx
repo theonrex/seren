@@ -41,7 +41,7 @@ export default function ProfilePage({
       <div className="profile-section">
         <h2 className="section-title"> Merchants Account</h2>
         <div className="">
-          {!userProfileInfo ? (
+          {userProfileInfo ? (
             <div className="user-info-grid">
               {userProfileInfo?.map(
                 (

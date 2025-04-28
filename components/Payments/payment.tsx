@@ -24,7 +24,7 @@ export default function Payment() {
   const [status, setStatus] = useState<string | null>(null);
   const [url, setUrl] = useState(""); // New state for storing the pasted URL
   const [loading, setLoading] = useState(false); // Loading state to disable button
-  const client = useSuiClient();
+  const suiClient = useSuiClient();
 
   const account = useCurrentAccount();
   const { mutateAsync: signAndExecuteTransaction } =
@@ -33,17 +33,22 @@ export default function Payment() {
   // Function to extract merchantaccount and paymentId from the URL
   const handleUrlChange = (e: any) => {
     setUrl(e.target.value); // Update URL state
-    const urlParams = new URLSearchParams(new URL(e.target.value).search);
+    try {
+      const urlParams = new URLSearchParams(new URL(e.target.value).search);
 
-    // Extract the parameters from the URL
-    const extractedMerchantAccount = urlParams.get("account"); // Use 'account' as merchantaccount
-    const extractedPaymentId = urlParams.get("key"); // Use 'key' as paymentId
+      // Extract the parameters from the URL
+      const extractedMerchantAccount = urlParams.get("account"); // Use 'account' as merchantaccount
+      const extractedPaymentId = urlParams.get("key"); // Use 'key' as paymentId
 
-    if (extractedMerchantAccount) {
-      setMerchantAccount(extractedMerchantAccount); // Update merchantAccount state
-    }
-    if (extractedPaymentId) {
-      setPaymentId(extractedPaymentId); // Update paymentId state
+      if (extractedMerchantAccount) {
+        setMerchantAccount(extractedMerchantAccount); // Update merchantAccount state
+      }
+      if (extractedPaymentId) {
+        setPaymentId(extractedPaymentId); // Update paymentId state
+      }
+    } catch (error) {
+      // Handle invalid URL
+      console.error("Invalid URL format:", error);
     }
   };
 
@@ -91,12 +96,24 @@ export default function Payment() {
       // Optional: let the wallet set gas
       await paymentClient.makePayment(tx, paymentId, BigInt(tip));
 
+      // Pass the suiClient to the toJSON method
+      // const txnBytes = await tx.build({ client: suiClient });
+      const txnJSON = await tx.serialize();
+
       const result = await signAndExecuteTransaction({
-        transaction: await tx.toJSON(),
+        transaction: txnJSON,
         chain: "sui:testnet", // or "sui:mainnet"
       });
 
-      const transactionBlock = await client.getTransactionBlock({
+      await suiClient.waitForTransaction({
+        digest: result.digest,
+        options: {
+          showEffects: true,
+          showEvents: true,
+        },
+      });
+
+      const transactionBlock = await suiClient.getTransactionBlock({
         digest: result.digest,
         options: {
           showEffects: true,
@@ -119,9 +136,23 @@ export default function Payment() {
       );
       setLoading(false); // Set loading to false after success
     } catch (err) {
-      console.error("Payment error:", err); // Log the error to console
-      setStatus("❌ Payment failed.");
-      toast.error("❌ Payment failed.");
+      console.error("Payment error:", err); // Always log the full error
+
+      let errorMessage = "❌ Payment failed.";
+
+      if (err instanceof Error) {
+        if (
+          err.message.includes("referenced transaction") ||
+          err.message.includes("not found")
+        ) {
+          errorMessage = "❌ Payment ID not found. ";
+        } else {
+          errorMessage = `❌ Payment failed: ${err.message}`;
+        }
+      }
+
+      setStatus(errorMessage);
+      toast.error(errorMessage);
       setLoading(false); // Set loading to false if there's an error
     }
   };
@@ -158,7 +189,7 @@ export default function Payment() {
           <Button
             onClick={handlePayment}
             className="pay-btn"
-            disabled={loading || !paymentId || !tip || !merchantAccount} // Disable when loading or fields are empty
+            disabled={loading || !paymentId || !merchantAccount} // Disable when loading or fields are empty
           >
             {loading ? "Processing..." : "Pay"}
           </Button>

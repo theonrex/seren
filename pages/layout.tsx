@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import Navbar from "@/components/Navbar";
+import NavbarBody from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { ThemeModeScript } from "flowbite-react";
 import Head from "next/head";
@@ -21,11 +21,10 @@ export default function Layout({ children }: LayoutProps) {
           rel="stylesheet"
         />
       </Head>
-
       <Toaster position="top-right" />
-      <Navbar />
+      <NavbarBody />
       <main>{children}</main>
-      <ToastContainer position="top-right" autoClose={5000} />
+      <ToastContainer position="top-right" autoClose={5000} />{" "}
     </>
   );
 }

@@ -7,3 +7,42 @@
 .nav_ul li a {
   color: white !important;
 }
+
+.nav_div {
+  background: linear-gradient(135deg, #011113, #070e1b);
+}
+
+.nav_div .navbar_collapse ul {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.nav_div ul li a {
+  font-size: 1.2em;
+  color: white;
+}
+.Dropdown_Div {
+  background: linear-gradient(135deg, #001f23, #030c1d);
+  border: none;
+  width: auto;
+  padding: 1em;
+}
+
+.Dropdown_Div .Dropdown_Div_link,
+.Dropdown_Div .Dropdown_Div_link a {
+  padding: 0.5em;
+  color: white;
+}
+
+.Dropdown_Div span:active {
+  padding-bottom: 0.5em;
+  background-color: unset;
+}
+
+@media (max-width: 767px) {
+  .nav_div .navbar_collapse ul {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

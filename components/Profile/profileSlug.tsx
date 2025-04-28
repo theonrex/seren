@@ -12,6 +12,7 @@ import { PaymentClient } from "../../payment/src/payment-client";
 import { ACCOUNT, NETWORK } from "../../payment/test/ptbs/utils";
 import SetRecovery from "./setRecovery";
 import SetOwner from "./setOwner";
+import Link from "next/link";
 // import "./ProfilePage.css
 
 export default function UserProfileDetailSlug() {
@@ -133,15 +134,54 @@ export default function UserProfileDetailSlug() {
           <li className="profile-link-item">
             {" "}
             <div className="">
-              {" "}
-              <SetRecovery />
+              <Link href="/profile/recovery">
+                <div
+                  className="profile_div"
+                  data-modal-target="static-modal"
+                  data-modal-toggle="static-modal"
+                >
+                  <span>Set Recovery Address</span>
+                  {/*               <span className="profile_link_span">
+                   */}
+                  <div className="profile_link_span">
+                    <button
+                      data-modal-target="static-modal"
+                      data-modal-toggle="static-modal"
+                      // className="block text-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      type="button"
+                    >
+                      <FaChevronRight className="chevron-icon" />
+                    </button>
+                  </div>
+                </div>{" "}
+              </Link>
               <span></span>
             </div>
           </li>{" "}
           <li className="profile-link-item">
-            {" "}
             <div className="">
-              <SetOwner />
+              <Link href="/profile/setowner">
+                <div
+                  className="profile_div"
+                  data-modal-target="static-modal"
+                  data-modal-toggle="static-modal"
+                >
+                  <span>Set Owner Address</span>
+                  {/*               <span className="profile_link_span">
+                   */}
+                  <div className="profile_link_span">
+                    <button
+                      data-modal-target="static-modal"
+                      data-modal-toggle="static-modal"
+                      // className="block text-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      type="button"
+                    >
+                      <FaChevronRight className="chevron-icon" />
+                    </button>
+                  </div>
+                </div>{" "}
+              </Link>
+              <span></span>
             </div>
           </li>
         </ul>

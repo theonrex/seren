@@ -35,7 +35,7 @@ export default function PendingPayments({
               const account = payment.fields?.account;
               const paymentKey = payment.fields?.key;
 
-              const linkToCopy = `https://your-link.com?account=${account}&key=${paymentKey}`;
+              const linkToCopy = `http://localhost:3000/makepayment?account=${account}&key=${paymentKey}`;
 
               return (
                 <div
@@ -56,7 +56,8 @@ export default function PendingPayments({
                     </div>
                   </div>
 
-                  <div className="flex items-center">
+                  {/* HERE: grouped the three right-side items */}
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <span className="text-green-400 font-semibold text-sm sm:text-base">
                       +{formatAmount(payment.args?.amount || 0)} SUI
                     </span>
@@ -72,8 +73,6 @@ export default function PendingPayments({
                         )}
                       </button>
                     </CopyToClipboard>
-                  </div>
-                  <div>
                     <ScanModal link={linkToCopy} />
                   </div>
                 </div>
