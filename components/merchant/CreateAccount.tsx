@@ -8,6 +8,7 @@ import { NETWORK } from "../../payment/test/ptbs/utils";
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import Link from "next/link";
+import { toast } from "react-toastify"; // Import toast
 
 // Firebase imports
 import { db, storage } from "@/firebase"; // Import Firebase utils
@@ -18,15 +19,10 @@ interface FileInterface {
   name: string;
 }
 
-export default function MerchantSlug() {
+export default function CreateAccount() {
   const account = useCurrentAccount();
   const user = account?.address || "";
   const [balance, setBalance] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [description, setDescription] = useState("");
-  const [coinType, setCoinType] = useState("0x2::sui::SUI");
-  const [amount, setAmount] = useState("0");
-  const [generatedPayId, setGeneratedPayId] = useState("");
   const [shopName, setShopName] = useState("");
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
@@ -77,7 +73,7 @@ export default function MerchantSlug() {
           onSuccess: async (result) => {
             setDigest(result.digest);
             setMessage("Payment account created successfully");
-            // console.log("Transaction result:", result);
+            toast.success("Payment account created successfully!"); // Success toast
 
             // Store data in Firestore
             try {
@@ -99,6 +95,7 @@ export default function MerchantSlug() {
               }
 
               await addDoc(collection(db, "paymentAccounts"), dataToStore);
+              // Reset input fields
               setShopName("");
               setUsername("");
               setProfilePicture("");
@@ -108,6 +105,7 @@ export default function MerchantSlug() {
           },
           onError: (err) => {
             setError(err instanceof Error ? err.message : "Transaction failed");
+            toast.error("Transaction failed. Please try again."); // Error toast
             console.error("Transaction error:", err);
           },
           onSettled: () => {
@@ -119,6 +117,7 @@ export default function MerchantSlug() {
       setError(
         err instanceof Error ? err.message : "Failed to create payment account"
       );
+      toast.error("Failed to create payment account."); // Error toast
       console.error("Error creating payment account:", err);
       setIsLoading(false);
     }
@@ -176,22 +175,10 @@ export default function MerchantSlug() {
           </div>
 
           <div className="flex justify-between mt-4">
-            <button onClick={handleSubmit}>Create Merchant Account</button>
+            <button onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? "Creating..." : "Create Merchant Account"}
+            </button>
           </div>
-
-          {generatedPayId && (
-            <div className="mt-4 bg-gray-800 p-3 rounded text-sm break-words">
-              <strong>Pay Link:</strong>
-              <br />
-              <a
-                href={generatedPayId}
-                className="text-blue-400 underline"
-                target="_blank"
-              >
-                {generatedPayId}
-              </a>
-            </div>
-          )}
         </div>
       </div>
     </div>

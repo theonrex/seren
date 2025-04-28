@@ -18,7 +18,7 @@
 
 /* Glass-style card */
 .glass-panel {
-  background: rgba(0, 36, 42, 0.65);
+  background: #00242aa6;
   backdrop-filter: blur(14px);
   border-radius: 1.5rem;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
@@ -26,7 +26,9 @@
   transition: all 0.3s ease;
   margin: 1em 0;
 }
-
+.custom-blue {
+  background-color: #00242aa6;
+}
 .glass-panel:hover {
   transform: translateY(-2px);
 }
@@ -256,4 +258,7 @@
 
 .make-payment-btn:hover {
   color: #5cb3ff;
+}
+.make-payment {
+  font-size: 2em;
 }

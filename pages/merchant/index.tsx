@@ -23,7 +23,6 @@ export default function Index() {
   const router = useRouter();
   const account = useCurrentAccount();
   const user: string | any = account?.address;
-  const isLoading = !account?.address;
 
   const [accounts, setAccounts] = useState<any>([]);
   const [loading, setLoading] = useState(false);
@@ -92,14 +91,17 @@ export default function Index() {
         JSON.stringify(accountToStore)
       );
 
-      router.push(`/merchant/${merchantAddress.id}`);
+      // Use setTimeout to delay the page transition until loading is finished
+      setTimeout(() => {
+        router.push(`/merchant/${merchantAddress.id}`);
+      }, 500); // Delay for smooth transition
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load payment account"
       );
       console.error(err);
     } finally {
-      setLoading(false);
+      // The loading state should be set to false after the transition begins
     }
   };
 
@@ -154,7 +156,7 @@ export default function Index() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-400"></div>
           </div>
         ) : accounts.length > 0 ? (
-          <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
+          <div className=" rounded-lg border border-gray-800 p-6">
             <div className="flex flex-col md:flex-row justify-between items-center mb-6">
               <h2 className="text-xl font-semibold mb-4 md:mb-0">
                 Your Payment Accounts
@@ -173,7 +175,7 @@ export default function Index() {
                   placeholder="Search by name or address..."
                   value={searchQuery}
                   onChange={findAccountByName}
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sky-300 placeholder-gray-500"
+                  className="w-full px-4 py-2 custom-blue border border-gray-700 rounded-lg text-sky-300 placeholder-gray-500"
                 />
               </div>
 
@@ -181,7 +183,7 @@ export default function Index() {
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sky-300"
+                  className="w-full px-4 py-2 custom-blue border border-gray-700 rounded-lg text-sky-300"
                 >
                   <option value="name">Sort by Name</option>
                   <option value="id">Sort by Address</option>
@@ -197,7 +199,7 @@ export default function Index() {
                     className={`flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-colors ${
                       selectedAccountId === account.id
                         ? "bg-sky-900 border-sky-600"
-                        : "bg-gray-800 hover:bg-gray-700"
+                        : "custom-blue hover:bg-gray-700"
                     }`}
                   >
                     <input
@@ -209,11 +211,31 @@ export default function Index() {
                       className="h-5 w-5 text-sky-500"
                     />
                     <div className="ml-4 flex-1">
-                      <h3 className="font-medium text-lg">{account.name}</h3>
+                      <h3 className="font-medium text-lg capitalize">
+                        {account.name}
+                      </h3>
                       <p className="text-gray-400 text-sm font-mono">
-                        {truncateAddress(account.id)}
+                        {truncateAddress(account.id)}ii
                       </p>
                     </div>
+                    {selectedAccountId === account.id ? (
+                      <button
+                        type="submit"
+                        disabled={loading || !selectedAccountId}
+                        className="w-max  p-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:bg-gray-700 disabled:text-gray-400 transition-colors font-medium"
+                      >
+                        {loading ? (
+                          <span className="flex items-center justify-center">
+                            <span className="animate-spin h-5 w-5 border-t-2 border-b-2 border-white rounded-full mr-2"></span>
+                            Loading...
+                          </span>
+                        ) : (
+                          "Load Selected Account"
+                        )}
+                      </button>
+                    ) : (
+                      ""
+                    )}
                   </label>
                 ))}
               </div>

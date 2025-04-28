@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useEffect, useState } from "react";
 import Balance from "../Balance";
@@ -123,14 +122,14 @@ export default function ClientPage() {
     return eventType && eventType.includes("Withdraw");
   };
 
+  // console.log("eventType", filteredTxHistory);
+
   return (
     <div className="p-4">
       <Balance />
 
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-3">
-          Payment History (Package ID: {TARGET_PACKAGE_ID.slice(0, 10)}...)
-        </h3>
+        <h3 className="text-lg font-semibold mb-3">Payment History</h3>
 
         {isLoading ? (
           <div className="flex justify-center items-center py-10">
@@ -141,7 +140,7 @@ export default function ClientPage() {
             No transaction history found for this package ID.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 ">
             {filteredTxHistory.map((tx) => {
               // Find event from target package
               const relevantEvent = tx.events?.find(
@@ -157,12 +156,12 @@ export default function ClientPage() {
               const eventType =
                 relevantEvent?.type?.split("::").slice(-1)[0] ||
                 "Unknown Event";
-              const withdrawal = isWithdrawal(eventType);
+              const withdrawal = relevantEvent?.transactionModule;
 
               return (
                 <div
                   key={tx.digest}
-                  className="bg-gray-800 rounded-xl p-4 flex justify-between"
+                  className="glass-panel rounded-xl p-4 flex justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <FaPaperPlane
@@ -177,23 +176,23 @@ export default function ClientPage() {
                           ? `${parsedData.payment_id.slice(0, 8)}...`
                           : "N/A"}
                       </p>
-                      <p className="text-sm">
+                      {/* <p className="text-sm">
                         <span className="font-medium">Issued By:</span>{" "}
                         {parsedData.issued_by
                           ? `${parsedData.issued_by.slice(0, 8)}...`
                           : tx.transaction?.sender?.slice(0, 8) + "..."}
-                      </p>
+                      </p> */}
                       <p className="text-xs text-gray-400">{timestamp}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <span
                       className={`font-semibold ${
-                        withdrawal ? "text-red-500" : "text-green-400"
+                        withdrawal === "pay" ? "text-red-500" : "text-green-400"
                       }`}
                     >
                       {parsedData.amount
-                        ? `${withdrawal ? "+" : "-"}${
+                        ? `${withdrawal === "pay" ? "-" : "+"}${
                             Number(parsedData.amount) / 1e9
                           } SUI`
                         : "Amount N/A"}

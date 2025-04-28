@@ -39,16 +39,32 @@ a:hover {
   align-items: center;
   justify-content: flex-start;
 }
-.Merchant_link span{
+.Merchant_link span {
   margin-right: 0.5em;
 }
 
 .card {
-  background-color: #1c1c1c;
+  background: #00242aa6;
+  kdrop-filter: blur(14px);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  margin: 1em 0;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   width: 90%;
+}
+
+.modal_bg {
+  background: #00242ac1;
+}
+/* .modal_bg .modal_div {
+  margin-bottom: 1em;
+} */
+.modal_bg .modal_div div {
+  padding-top: 0.5em;
 }
 
 .card-header {
@@ -69,7 +85,7 @@ a:hover {
 .card input {
   width: 100%;
   padding: 10px;
-  background-color: #2c2c2c;
+  background: #000b0ea6;
   border: 1px solid #444;
   border-radius: 8px;
   color: skyblue;

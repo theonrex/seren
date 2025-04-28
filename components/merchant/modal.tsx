@@ -23,6 +23,9 @@ import {
   useCurrentAccount,
 } from "@mysten/dapp-kit";
 
+// Importing toast
+import { toast } from "react-toastify";
+
 export default function IssuePaymentModal({ merchantAddress }: any) {
   const [openModal, setOpenModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
@@ -38,6 +41,8 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
     setOpenModal(true);
     setPaymentAmount(0);
     setPaymentId("");
+    setDescription(""); // Clear the description
+    setCoinType("SUI"); // Reset the coin type to default
   };
 
   const convertAmount = (amount: number, coinType: string) => {
@@ -77,32 +82,33 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
         },
         {
           onSuccess: (result) => {
-            // Log the transaction result
-            console.log("Transaction Digest:", result.digest);
-            console.log("Transaction Signature:", result.signature);
-
-            // const data = result?.events?.[0]?.parsedJson;
-            // const newPaymentId = data?.payment_id ?? "";
-            // console.log("Parsed Event Data:", result);
-            // console.log("New Payment ID:", newPaymentId);
-
-            // Log raw effects (you can customize based on your needs)
-            // console.log("Raw Transaction Effects:", result.rawEffects);
-
-            // Log the transaction bytes (not human-readable, but for reference)
-            console.log("Raw Transaction Bytes:", result.bytes);
-
             // Store the payment data in Firebase
             addPaymentToFirebase({
-              // paymentId: newPaymentId,
               description,
-              amount: paymentAmount,
-              coinType,
+              amount: convertedAmount.toString(), // Convert BigInt to string for Firestore
+              coinType: coinTypeFull,
               merchantAddress,
+              transactionDigest: result.digest,
+              timestamp: new Date(),
             });
+
+            // Show success toast
+            toast.success("Payment successful!");
+
+            // Close the modal
+            setOpenModal(false);
+
+            // Clear the inputs after success
+            setDescription("");
+            setPaymentAmount(0);
+            setCoinType("SUI");
+
+            // Set paymentId (this can be a derived ID or payment-related ID if you want to use it later)
+            setPaymentId(result.digest);
           },
           onError: (err) => {
             console.error("Payment failed", err);
+            toast.error("Payment failed. Please try again.");
           },
           onSettled: () => {
             setIsIssuing(false);
@@ -111,28 +117,24 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
       );
     } catch (err) {
       console.error("Error during payment:", err);
+      toast.error("Error during payment processing.");
       setIsIssuing(false);
     }
   };
 
   // Function to save the payment details to Firebase
-  const addPaymentToFirebase = async ({ paymentData }: any) => {
+  const addPaymentToFirebase = async (paymentData: any) => {
     try {
       await addDoc(collection(db, "payments"), paymentData);
-      console.log("Payment data successfully saved to Firebase!");
+      // console.log("Payment data successfully saved to Firebase!");
     } catch (error) {
-      console.error("Error saving data to Firebase:", error);
+      console.error("Error saving data :", error);
     }
   };
 
   return (
     <div>
-      <div
-        onClick={openPaymentModal}
-        // className={`bg-gray-800 p-4 rounded-xl transition cursor-pointer ${
-        //   isIssuing ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-700"
-        // }`}
-      >
+      <div onClick={openPaymentModal}>
         <FaArrowUp className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
         <span className="text-xs sm:text-sm">
           {" "}
@@ -145,10 +147,11 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
         onClose={() => setOpenModal(false)}
         theme={{ content: { base: "bg-gray-800 text-white" } }}
         size="lg"
+        className="modal_bg"
       >
-        <ModalHeader>Issue Payment</ModalHeader>
-        <ModalBody>
-          <div className="space-y-4">
+        <ModalHeader className="modal_bg">Issue Payment</ModalHeader>
+        <ModalBody className="modal_bg">
+          <div className="space-y-4 modal_div">
             <div>
               <Label htmlFor="description">Payment Description</Label>
               <TextInput
@@ -204,7 +207,7 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
             )}
           </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="modal_bg">
           <Button
             onClick={issuePayment}
             className="bg-blue-600 hover:bg-blue-500"

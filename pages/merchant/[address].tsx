@@ -19,7 +19,7 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
 
   const accountAddress = address || (router.query.address as string);
   const account = useCurrentAccount();
-  const user: string = account!.address;
+  const user: string = account!?.address;
 
   useEffect(() => {
     if (!router.isReady || !accountAddress || !user) return;
@@ -77,10 +77,17 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
   if (!user) {
     return <ConnectWallet />;
   }
+  console.log("accountAddress", accountAddress);
+  console.log("user", user);
+
+  //accountAddress
+  if (!user) {
+    return <ConnectWallet />;
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen  text-white flex items-center justify-center">
         <div className="text-center">
           <p className="text-xl">Loading account details...</p>
         </div>
@@ -90,9 +97,9 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen  text-white">
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-md mx-auto p-6 bg-black text-white rounded shadow border border-red-500">
+          <div className="max-w-md mx-auto p-6  text-white rounded shadow border border-red-500">
             <h2 className="text-xl font-semibold mb-4">Error</h2>
             <p className="text-red-400 mb-4">{error}</p>
             <button
@@ -108,14 +115,14 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen  text-white">
+      <div className=" mx-auto max-w-screen-xl">
         <Head>
           <title>{accountDetails?.name || "Account Details"}</title>
           <meta name="description" content="Payment account details" />
         </Head>
 
-        <main className="max-w-5xl mx-auto">
+        <main className=" mx-auto">
           <div className="mb-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold">Account Details</h1>
             <button
@@ -126,18 +133,18 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
             </button>
           </div>
 
-          <div className="bg-black text-white rounded shadow border border-gray-700 p-6">
+          <div className=" text-white rounded shadow border border-gray-700 p-6">
             {accountDetails ? (
               <>
                 <MerchantSlug merchantAddress={accountDetails.id} />
                 <div className="grid grid-cols-1 gap-6 mb-6">
                   <div>
-                    <h2 className="text-xl font-semibold mb-2">
+                    {/* <h2 className="text-xl font-semibold mb-2">
                       {accountDetails.name}
                     </h2>
                     <p className="text-gray-400">
                       Account ID: {accountDetails.id}
-                    </p>
+                    </p> */}
                     {accountDetails.address && (
                       <p className="text-gray-400">
                         {/* Address: {accountDetails.address} */}

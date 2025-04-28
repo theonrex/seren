@@ -5,12 +5,11 @@ import "../styles/global.css";
 import "flowbite";
 import Layout from "./layout";
 // import { SuiClientProvider } from "@/contexts/SuiClientContext"; // adjust path as needed
-import "../styles/main.css"
-import "../styles/nav.css"
-import "../styles/merchant.css"
-import "../styles/index.css"
+import "../styles/main.css";
+import "../styles/nav.css";
+import "../styles/merchant.css";
+import "../styles/index.css";
 import "@mysten/dapp-kit/dist/index.css";
-
 
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
@@ -33,12 +32,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <WalletProvider autoConnect>
           <Layout>
             <Component {...pageProps} />
-            <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
           </Layout>
         </WalletProvider>
       </SuiClientProvider>
       {/* </SuiClientProvider>
       </ZkLoginSessionProvider> */}
+      <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     </QueryClientProvider>
   );
 }

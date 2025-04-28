@@ -7,24 +7,79 @@ import {
   FaHistory,
   FaCopy,
 } from "react-icons/fa";
-import { AiOutlinePlus, AiOutlineCopy } from "react-icons/ai";
 import IssuePaymentModal from "./modal";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import Link from "next/link";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import RecentTransaction from "./recentTransaction";
+import { ACCOUNT } from "../../payment/test/ptbs/utils";
+import { useRouter } from "next/router";
+import PendingPayments from "./PendingPayments";
 export default function MerchantSlug({ merchantAddress }: any) {
   const account = useCurrentAccount();
-  const user: string = account!.address;
+  const user: string = account!?.address;
+  const router = useRouter();
+
+  const { id } = router.query;
 
   const [balance, setBalance] = useState<string>("0");
   const [pendingPayments, setPendingPayments] = useState<any>(null);
   const [recentTransactions, setRecentTransactions] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [copiedPayment, setCopiedPayment] = useState<string | null>(null);
+  const [paymentAccount, setPaymentAccount] = useState<any>(null);
+  const [ownedObjects, setOwnedObjects] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+  const [userAccount, setUserAccount] = useState<string | any>("");
 
+  const currentAccount = useCurrentAccount();
+  const [paymentClient, setPaymentClient] = useState<PaymentClient | null>(
+    null
+  );
+  console.log("paymentAccount", paymentAccount);
+  console.log("userAccount", userAccount);
   console.log("pendingPayments", pendingPayments);
+  // console.log("ownedObjects", ownedObjects);
+
+  useEffect(() => {
+    const fetchPaymentData = async () => {
+      if (!currentAccount?.address) return;
+
+      try {
+        setLoading(true);
+
+        const client = await PaymentClient.init(
+          NETWORK,
+          currentAccount.address,
+          ACCOUNT
+        );
+
+        const userAccounts = client.getUserPaymentAccounts();
+        const accountId = userAccounts.find((a) => a.id === id)?.id;
+
+        if (accountId) {
+          await client.switchAccount(accountId);
+        }
+
+        setPaymentClient(client);
+        setPaymentAccount(client.paymentAccount);
+
+        const objects = await client.getOwnedObjects();
+        setOwnedObjects(objects);
+
+        const userA = await client.getUserProfile();
+        setUserAccount(userA);
+      } catch (err) {
+        console.error("Error loading payment data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaymentData();
+  }, []);
 
   useEffect(() => {
     if (!merchantAddress) return;
@@ -72,6 +127,23 @@ export default function MerchantSlug({ merchantAddress }: any) {
     fetchData();
   }, [merchantAddress]);
 
+  useEffect(() => {
+    if (!pendingPayments) return;
+
+    const checkPayments = () => {
+      for (const key in pendingPayments) {
+        const payment = pendingPayments[key];
+        if (payment.fields.creator !== user) {
+          router.push("/merchant");
+        } else {
+          console.log("This is the user"); // Handle logic for user match
+        }
+      }
+    };
+
+    checkPayments();
+  }, [pendingPayments, user]);
+
   // Helper function to format amount with proper decimals
   const formatAmount = (amount: number) => {
     if (typeof amount === "bigint") {
@@ -101,10 +173,13 @@ export default function MerchantSlug({ merchantAddress }: any) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
+  const handleCopy = (key: string) => {
+    setCopiedPayment(key);
+    setTimeout(() => setCopiedPayment(null), 2000); // Reset after 2 seconds
+  };
   return (
-    <div className="min-h-screen bg-black text-sky-400 px-4 py-6 font-sans">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen  text-sky-400 px-4 py-6 font-sans">
+      <div className=" mx-auto space-y-6">
         {/* Header with back link */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Link href="/merchant">
@@ -202,176 +277,16 @@ export default function MerchantSlug({ merchantAddress }: any) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Pending Payments Section */}
-          <div className="bg-gray-900 p-4 sm:p-5 rounded-xl border border-gray-800">
-            <div className="flex justify-between items-center mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold">
-                Pending Payments
-              </h3>
-              <button className="text-sky-400 text-xs sm:text-sm hover:text-sky-300 transition-colors">
-                See All
-              </button>
-            </div>
-
-            {isLoading ? (
-              <div className="space-y-2 sm:space-y-3">
-                {[1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="animate-pulse bg-gray-800 h-12 sm:h-16 rounded-xl"
-                  ></div>
-                ))}
-              </div>
-            ) : pendingPayments && Object.keys(pendingPayments).length > 0 ? (
-              <div className="space-y-2 sm:space-y-3">
-                {Object.keys(pendingPayments).map((key) => {
-                  const payment = pendingPayments[key];
-                  const account = payment.fields?.account;
-                  const paymentKey = payment.fields?.key;
-
-                  const linkToCopy = `https://your-link.com?account=${account}&key=${paymentKey}`;
-
-                  return (
-                    <div
-                      key={key}
-                      className="bg-gray-800 rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="bg-green-900/30 p-1 sm:p-2 rounded-full">
-                          <AiOutlinePlus className="text-green-400 text-sm sm:text-lg" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm sm:text-base">
-                            {payment.fields?.description || "Payment"}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {payment.date || "Pending"}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-green-400 font-semibold text-sm sm:text-base">
-                        +{formatAmount(payment.args?.amount || 0)} SUI
-                      </span>
-                      <div className="flex items-center">
-                        <CopyToClipboard text={linkToCopy}>
-                          <button className="text-gray-400 hover:text-gray-200 transition-colors">
-                            <AiOutlineCopy className="text-lg" />
-                          </button>
-                        </CopyToClipboard>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-6 sm:py-8 text-gray-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 sm:mb-3 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                <p className="text-sm sm:text-base">No pending payments</p>
-              </div>
-            )}
-          </div>
+          <PendingPayments
+            isLoading={isLoading}
+            pendingPayments={pendingPayments}
+            handleCopy={handleCopy}
+            copiedPayment={copiedPayment}
+            formatAmount={formatAmount}
+          />
 
           {/* Recent Transactions Section */}
-          <div className="bg-gray-900 p-4 sm:p-5 rounded-xl border border-gray-800">
-            <div className="flex justify-between items-center mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold">
-                Recent Transactions
-              </h3>
-              <button className="text-sky-400 text-xs sm:text-sm hover:text-sky-300 transition-colors">
-                View All
-              </button>
-            </div>
-
-            {isLoading ? (
-              <div className="space-y-2 sm:space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="animate-pulse bg-gray-800 h-12 sm:h-16 rounded-xl"
-                  ></div>
-                ))}
-              </div>
-            ) : recentTransactions.length > 0 ? (
-              <div className="space-y-2 sm:space-y-3">
-                {recentTransactions.map(
-                  (tx: {
-                    id: React.Key | null | undefined;
-                    type: string;
-                    description: string | null | undefined;
-                    date: string | number | bigint | null | undefined;
-                    amount: string | number | bigint | null | undefined;
-                  }) => (
-                    <div
-                      key={tx.id}
-                      className="bg-gray-800 rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div
-                          className={`p-1 sm:p-2 rounded-full ${
-                            tx.type === "incoming"
-                              ? "bg-green-900/30"
-                              : "bg-red-900/30"
-                          }`}
-                        >
-                          {tx.type === "incoming" ? (
-                            <AiOutlinePlus className="text-green-400 text-sm sm:text-lg" />
-                          ) : (
-                            <FaArrowUp className="text-red-400 text-sm sm:text-lg" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">
-                            {tx.description}
-                          </p>
-                          <p className="text-xs text-gray-400">{tx.date}</p>
-                        </div>
-                      </div>
-                      <span
-                        className={`font-semibold text-sm sm:text-base ${
-                          tx.type === "incoming"
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }`}
-                      >
-                        {tx.type === "incoming" ? "+" : "-"}
-                        {tx.amount} SUI
-                      </span>
-                    </div>
-                  )
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-6 sm:py-8 text-gray-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 sm:mb-3 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <p className="text-sm sm:text-base">No transactions found</p>
-              </div>
-            )}
-          </div>
+          <RecentTransaction merchantAddress={merchantAddress} />
         </div>
       </div>
     </div>

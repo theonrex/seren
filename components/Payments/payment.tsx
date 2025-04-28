@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -14,6 +14,8 @@ import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
 import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
 import { useSuiClient } from "@mysten/dapp-kit";
+import { toast } from "react-toastify"; // Make sure toast is installed and imported
+
 export default function Payment() {
   const [openModal, setOpenModal] = useState(false);
   const [tip, setTip] = useState("0");
@@ -21,6 +23,7 @@ export default function Payment() {
   const [merchantAccount, setMerchantAccount] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [url, setUrl] = useState(""); // New state for storing the pasted URL
+  const [loading, setLoading] = useState(false); // Loading state to disable button
   const client = useSuiClient();
 
   const account = useCurrentAccount();
@@ -31,8 +34,10 @@ export default function Payment() {
   const handleUrlChange = (e: any) => {
     setUrl(e.target.value); // Update URL state
     const urlParams = new URLSearchParams(new URL(e.target.value).search);
-    const extractedMerchantAccount = urlParams.get("merchantaccount");
-    const extractedPaymentId = urlParams.get("paymentId");
+
+    // Extract the parameters from the URL
+    const extractedMerchantAccount = urlParams.get("account"); // Use 'account' as merchantaccount
+    const extractedPaymentId = urlParams.get("key"); // Use 'key' as paymentId
 
     if (extractedMerchantAccount) {
       setMerchantAccount(extractedMerchantAccount); // Update merchantAccount state
@@ -42,25 +47,36 @@ export default function Payment() {
     }
   };
 
-  const handlePayment = async () => {
-    // console.log("📝 Payment attempt initiated");
-    // console.log("📦 Payment ID:", paymentId);
-    // console.log("💸 Tip (MIST):", tip);
-    // console.log("💼 Merchant Account:", merchantAccount);
+  // Use useEffect to auto-populate the URL input on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const extractedMerchantAccount = urlParams.get("account"); // Use 'account' as merchantaccount
+    const extractedPaymentId = urlParams.get("key"); // Use 'key' as paymentId
 
+    if (extractedMerchantAccount && extractedPaymentId) {
+      setUrl(window.location.href); // Set the full URL in the input
+      setMerchantAccount(extractedMerchantAccount); // Update merchantAccount state
+      setPaymentId(extractedPaymentId); // Update paymentId state
+    }
+  }, []); // Empty dependency array to run this effect once on page load
+
+  const handlePayment = async () => {
     if (!paymentId || !tip || !merchantAccount) {
       setStatus(
         "❌ Please enter a valid Payment ID, Tip, and Merchant Account."
       );
+      toast.error("❌ Please enter all fields!");
       return;
     }
 
     if (!account) {
       setStatus("❌ No wallet connected.");
+      toast.error("❌ No wallet connected.");
       return;
     }
 
     try {
+      setLoading(true); // Set loading to true when payment is processing
       setStatus("⏳ Processing payment...");
 
       const paymentClient = await PaymentClient.init(
@@ -88,29 +104,31 @@ export default function Payment() {
         },
       });
 
-      // Now you can safely access status!
-      const status = transactionBlock.effects?.status;
       const txStatus = transactionBlock.effects?.status?.status;
-      // const status = result.effects?.status;
-      console.log("status", status);
       if (txStatus !== "success") {
-        // console.error(result.effects?.status.status.error);
         setStatus("❌ Payment failed.");
+        toast.error("❌ Payment failed.");
+        setLoading(false);
         return;
       }
 
       const data = transactionBlock.events?.[0]?.parsedJson as any;
-      console.log("First event data:", data); // console.log("✅ Payment Success:", data);
       setStatus(`✅ Paid ${data.amount} with Tip ${data.tip}`);
+      toast.success(
+        `✅ Payment Success! Paid ${data.amount} with Tip ${data.tip}`
+      );
+      setLoading(false); // Set loading to false after success
     } catch (err) {
-      console.error("❌ Payment Error:", err);
+      console.error("Payment error:", err); // Log the error to console
       setStatus("❌ Payment failed.");
+      toast.error("❌ Payment failed.");
+      setLoading(false); // Set loading to false if there's an error
     }
   };
 
   return (
     <div className="payment-container">
-      <div className="make-payment-btn">Make Payment</div>
+      <div className="make-payment">Make Payment</div>
 
       <div className="payment-form">
         <div className="form-body">
@@ -137,8 +155,12 @@ export default function Payment() {
           {status && <p className="status-message">{status}</p>}
         </div>
         <div className="pay-btn-container">
-          <Button onClick={handlePayment} className="pay-btn">
-            Pay
+          <Button
+            onClick={handlePayment}
+            className="pay-btn"
+            disabled={loading || !paymentId || !tip || !merchantAccount} // Disable when loading or fields are empty
+          >
+            {loading ? "Processing..." : "Pay"}
           </Button>
         </div>
       </div>
