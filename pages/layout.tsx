@@ -17,7 +17,7 @@ export default function Layout({ children }: LayoutProps) {
       <Head>
         <meta
           name="description"
-          content="Suipay - Your fast and secure payment solution."
+          content="Swoop - Your fast and secure payment solution."
         />
         <link rel="icon" href="/images/favicon.ico" />
         <ThemeModeScript />

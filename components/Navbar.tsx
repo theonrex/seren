@@ -31,9 +31,9 @@ export default function NavbarBody() {
     <div className="nav_div">
       <Navbar fluid rounded className="max-w-screen-xl mx-auto p-4 nav_div">
         <NavbarBrand href="/">
-          <Image src={suiPayImg} alt="SuiPlay Logo" width={30} height={30} />
+          <Image src={suiPayImg} alt="Swoop Logo" width={30} height={30} />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            SuiPlay
+            Swoop
           </span>
         </NavbarBrand>
 

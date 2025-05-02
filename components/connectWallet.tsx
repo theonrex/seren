@@ -9,8 +9,8 @@ export default function ConnectWallet() {
     <div className={styles.main}>
       <div className={styles.suiDiv}>
         <div className={styles.suiPay}>
-          <Image src={suiPayImg} width={600} height={600} alt="suiPayImg" />
-          <h1>SuiPay</h1>
+          <Image src={suiPayImg} width={600} height={600} alt="Swoop" />
+          <h1> Swoop</h1>
         </div>
         <div>
           <ConnectButton />{" "}
