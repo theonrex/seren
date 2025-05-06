@@ -22,8 +22,6 @@ export default function UserProfileDetailSlug() {
 
   const userId = typeof id === "string" ? id : id?.[0] ?? "";
 
-  // console.log("name", name);
-  console.log("id", id);
 
   const currentAccount = useCurrentAccount();
   const { mutateAsync: signAndExecute } = useSignAndExecuteTransaction();
@@ -35,8 +33,7 @@ export default function UserProfileDetailSlug() {
   const [paymentAccount, setPaymentAccount] = useState<any>(null);
   const [ownedObjects, setOwnedObjects] = useState<any>([]);
   const [loading, setLoading] = useState(false);
-  console.log("ownedObjects", ownedObjects);
-  console.log("paymentAccount", paymentAccount);
+ 
 
   //
   const user = {

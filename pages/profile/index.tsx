@@ -32,14 +32,6 @@ export default function Profile() {
   const [paymentNames, setPaymentNames] = useState(null);
   const [userProfileInfo, setUserProileInfo] = useState<any[]>([]);
 
-  //   console.log("testKeypair", testKeypair.toSuiAddress());
-  //   console.log("user", user);
-  console.log("paymentAccount", paymentAccount);
-  //   console.log("ownedObjects", ownedObjects);
-  console.log("userProfileInfo", userProfileInfo);
-  //   console.log("paymentNames", paymentNames);
-  //   console.log("paymentsConfig", paymentsConfig);
-
   useEffect(() => {
     const fetchPaymentData = async () => {
       if (!user) return;

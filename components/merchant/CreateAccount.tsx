@@ -62,7 +62,7 @@ export default function CreateAccount() {
       });
 
       // Log the transaction object before executing it
-      console.log("Created Transaction:", tx);
+      // console.log("Created Transaction:", tx);
 
       signAndExecuteTransaction(
         {

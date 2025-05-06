@@ -27,7 +27,7 @@ export default function ScanModal({ link }: any) {
         show={openModal}
         onClose={() => setOpenModal(false)}
         theme={{ content: { base: "bg-gray-800 text-white" } }}
-        size="lg"
+        size="md"
         className="modal_bg"
       >
         <ModalHeader className="modal_bg">Scan To Pay</ModalHeader>

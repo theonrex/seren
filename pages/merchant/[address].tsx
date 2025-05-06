@@ -46,7 +46,6 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
         }
       }
 
-      console.log("Initializing PaymentClient with user:", user);
       const paymentClient = await PaymentClient.init(NETWORK, user);
 
       const userAccounts = paymentClient.getUserPaymentAccounts();
@@ -77,8 +76,6 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
   if (!user) {
     return <ConnectWallet />;
   }
-  console.log("accountAddress", accountAddress);
-  console.log("user", user);
 
   //accountAddress
   if (!user) {

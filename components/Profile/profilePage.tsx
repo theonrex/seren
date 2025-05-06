@@ -11,8 +11,8 @@ export default function ProfilePage({
   paymentAccount,
   userProfileInfo,
 }: ProfilePageProps) {
-  console.log("userProfileInfo", userProfileInfo);
-  console.log("paymentAccount", paymentAccount);
+  // console.log("userProfileInfo", userProfileInfo);
+  // console.log("paymentAccount", paymentAccount);
   return (
     <div className="opensea-profile-container">
       <div className="banner"></div>

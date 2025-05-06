@@ -58,13 +58,19 @@ a:hover {
 }
 
 .modal_bg {
-  background: #00242ac1;
+  background: #000000c1;
 }
 /* .modal_bg .modal_div {
   margin-bottom: 1em;
 } */
 .modal_bg .modal_div div {
   padding-top: 0.5em;
+}
+
+.OpenModal button {
+  background-color: #0288d1;
+  border-radius: 0.5em;
+  padding: 1em 3em;
 }
 
 .card-header {

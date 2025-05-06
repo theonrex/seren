@@ -67,7 +67,6 @@ export default function SetOwner() {
         transaction: await tx.toJSON(),
         chain: "sui:testnet",
       });
-      console.log("Recovery address set:", result);
 
       toast.success("Recovery address set successfully!");
     } catch (err) {

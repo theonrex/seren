@@ -18,7 +18,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
   // Function to fetch all payments from Firebase and filter by merchantAddress
   const fetchPayments = async () => {
     try {
-      console.log("Fetching payments from Firebase");
+      // console.log("Fetching payments from Firebase");
       const querySnapshot = await getDocs(collection(db, "payments"));
 
       const payments: {
@@ -32,7 +32,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
         }
       });
 
-      console.log(`Found ${payments.length} payments for TARGET_ID`);
+      // console.log(`Found ${payments.length} payments for TARGET_ID`);
       return payments;
     } catch (error) {
       console.error("Error fetching payments from Firebase:", error);
@@ -44,7 +44,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
   // Function to fetch transaction details from Sui
   const fetchTransactionDetails = async (digestList: string[]) => {
     try {
-      console.log(`Fetching ${digestList.length} transaction details`);
+      // console.log(`Fetching ${digestList.length} transaction details`);
 
       if (digestList.length === 0) return [];
 

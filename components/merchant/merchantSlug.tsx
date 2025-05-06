@@ -16,6 +16,8 @@ import RecentTransaction from "./recentTransaction";
 import { ACCOUNT } from "../../payment/test/ptbs/utils";
 import { useRouter } from "next/router";
 import PendingPayments from "./PendingPayments";
+import WithdrawModal from "./WithdrawalModal";
+import DepositModal from "./DepositModal";
 export default function MerchantSlug({ merchantAddress }: any) {
   const account = useCurrentAccount();
   const user: string = account!?.address;
@@ -38,9 +40,9 @@ export default function MerchantSlug({ merchantAddress }: any) {
   const [paymentClient, setPaymentClient] = useState<PaymentClient | null>(
     null
   );
-  console.log("paymentAccount", paymentAccount);
-  console.log("userAccount", userAccount);
-  console.log("pendingPayments", pendingPayments);
+  // console.log("paymentAccount", paymentAccount);
+  // console.log("userAccount", userAccount);
+  // console.log("pendingPayments", pendingPayments);
   // console.log("ownedObjects", ownedObjects);
 
   useEffect(() => {
@@ -136,7 +138,7 @@ export default function MerchantSlug({ merchantAddress }: any) {
         if (payment.fields.creator !== user) {
           router.push("/merchant");
         } else {
-          console.log("This is the user"); // Handle logic for user match
+          console.log(""); 
         }
       }
     };
@@ -249,14 +251,8 @@ export default function MerchantSlug({ merchantAddress }: any) {
             </h2>
           )}
           <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
-            <button className="flex items-center justify-center gap-1 sm:gap-2 bg-sky-900 hover:bg-sky-800 text-white py-2 px-3 sm:px-4 rounded-lg transition-colors text-sm sm:text-base">
-              <FaArrowDown className="text-sm" />
-              <span>Deposit</span>
-            </button>
-            <button className="flex items-center justify-center gap-1 sm:gap-2 bg-gray-800 hover:bg-gray-700 text-sky-400 py-2 px-3 sm:px-4 rounded-lg border border-sky-800 transition-colors text-sm sm:text-base">
-              <FaArrowUp className="text-sm" />
-              <span>Withdraw</span>
-            </button>
+            <DepositModal merchantAddress={merchantAddress} />
+            <WithdrawModal merchantAddress={merchantAddress} />{" "}
           </div>
         </div>
 

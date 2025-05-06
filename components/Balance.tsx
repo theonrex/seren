@@ -7,6 +7,8 @@ import {
 } from "react-icons/fa";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import Link from "next/link";
+import DepositModal from "./DepositModal";
+import WithdrawModal from "./WithdrawalModal";
 
 export default function WalletOverview() {
   const [suiBalance, setSuiBalance] = useState<number>(0);
@@ -96,19 +98,16 @@ export default function WalletOverview() {
             <FaPaperPlane />
             <span>Make Payment</span>
           </Link>
-          <div className="glass-panel icon-box">
+          {/* <div className="glass-panel icon-box">
             <FaArrowUp />
-            <span>Withdraw</span>
-          </div>
+          </div> */}
+
+          <WithdrawModal />
           <div className="glass-panel icon-box">
             <FaMoneyBillWave />
             <span>Earn</span>
           </div>
-          <div className="glass-panel icon-box">
-            {" "}
-            <FaArrowDown />
-            <span>Deposit</span>
-          </div>
+          <DepositModal copyAddress={account.address} />
         </div>
       </div>
     </div>

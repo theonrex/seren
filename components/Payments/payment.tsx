@@ -98,7 +98,7 @@ export default function Payment() {
 
       // Pass the suiClient to the toJSON method
       // const txnBytes = await tx.build({ client: suiClient });
-      const txnJSON = await tx.serialize();
+      const txnJSON = await tx.toJSON();
 
       const result = await signAndExecuteTransaction({
         transaction: txnJSON,
