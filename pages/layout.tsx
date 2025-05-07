@@ -19,7 +19,10 @@ export default function Layout({ children }: LayoutProps) {
           name="description"
           content="Seren - Your fast and secure payment solution."
         />
-        <link rel="icon" href="/images/favicon.ico" />
+        <link
+          rel="icon"
+          href="https://ipfs.io/ipfs/bafkreiczsfcf5n4asilwg3ne6x2ko6setwnarjhyndwhdbfafafaiwpjbq"
+        />
         <ThemeModeScript />
         <link
           href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"
