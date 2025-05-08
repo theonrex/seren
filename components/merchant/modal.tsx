@@ -135,8 +135,8 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
   return (
     <div>
       <div onClick={openPaymentModal}>
-        <FaArrowUp className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
-        <span className="text-xs sm:text-sm">
+        <FaArrowUp className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-yellow-400" />
+        <span className="text-xs sm:text-sm text_white ">
           {" "}
           {isIssuing ? "Issuing..." : "Issue Payment"}
         </span>
@@ -194,11 +194,11 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
                 <div className="flex items-center space-x-2">
                   <span>{paymentId}</span>
                   <FaLink
-                    className="cursor-pointer text-blue-500"
+                    className="cursor-pointer text-yellow-500"
                     onClick={() => navigator.clipboard.writeText(paymentId)}
                   />
                   <FaQrcode
-                    className="cursor-pointer text-blue-500"
+                    className="cursor-pointer text-yellow-500"
                     onClick={() => alert("QR Code for payment ID")}
                   />
                 </div>
@@ -210,7 +210,7 @@ export default function IssuePaymentModal({ merchantAddress }: any) {
         <ModalFooter className="modal_bg">
           <Button
             onClick={issuePayment}
-            className="bg-blue-600 hover:bg-blue-500"
+            className="bg-yellow-600 hover:bg-yellow-500"
             disabled={isIssuing || paymentAmount <= 0}
           >
             {isIssuing ? "Issuing..." : "Confirm Payment"}

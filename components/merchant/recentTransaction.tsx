@@ -22,8 +22,9 @@ export default function RecentTransactions({ merchantAddress }: any) {
       const querySnapshot = await getDocs(collection(db, "payments"));
 
       const payments: {
-        [x: string]: any; id: any 
-}[] = [];
+        [x: string]: any;
+        id: any;
+      }[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         // Only include payments where merchantAddress matches TARGET_ID
@@ -130,7 +131,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
 
   return (
     <div>
-      <div className="bg-gray-900 p-4 sm:p-5 rounded-xl border border-gray-800">
+      <div className="  bg_yellow_dark p-4 sm:p-5 rounded-xl border border-gray-800">
         <div className="flex justify-between items-center mb-3 sm:mb-4">
           <h3 className="text-base sm:text-lg font-semibold">
             Transaction History
@@ -147,7 +148,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
         </div>
 
         {isLoading ? (
-          <div className="space-y-2 sm:space-y-3">
+          <div className="bg_yellow_dark space-y-2 sm:space-y-3">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -156,7 +157,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-6 sm:py-8 text-red-400">
+          <div className="  text_white text-center py-6 sm:py-8 text-red-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 sm:mb-3 text-red-500"
@@ -180,7 +181,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
             </button>
           </div>
         ) : transactions.length > 0 ? (
-          <div className="space-y-2 sm:space-y-3">
+          <div className="text_white space-y-2 sm:space-y-3">
             {transactions.map((tx: any) => {
               const payment = tx.payment || {};
               const amount = formatAmount(
@@ -197,7 +198,7 @@ export default function RecentTransactions({ merchantAddress }: any) {
                   target="_blank"
                   rel="noopener noreferrer"
                   key={tx.digest}
-                  className="bg-gray-800 rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors block"
+                  className="bg_yellow_dark rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors block"
                 >
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="p-1 sm:p-2 rounded-full bg-green-900/30">

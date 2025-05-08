@@ -17,8 +17,8 @@ export default function ConnectWallet() {
         </div>
       </div>
       <div className={styles.gradinetImg}>
-        <p>Powered by account.tech</p>{" "}
-        <Image src={gradinetImg} width={600} height={600} alt="gradinetImg" />
+        {/* <p>Powered by account.tech</p>{" "} */}
+        {/* <Image src={gradinetImg} width={600} height={600} alt="gradinetImg" /> */}
       </div>
     </div>
   );

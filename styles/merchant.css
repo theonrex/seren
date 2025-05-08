@@ -1,7 +1,7 @@
 /* General styles */
 body {
   background-color: #0e0e0e;
-  color: skyblue;
+  color: #ffffff;
   font-family: "Arial", sans-serif;
   margin: 0;
   padding: 0;
@@ -9,7 +9,7 @@ body {
 }
 
 a {
-  color: skyblue;
+  color: #e7b82b;
   text-decoration: none;
 }
 

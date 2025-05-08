@@ -18,7 +18,7 @@
 
 /* Glass-style card */
 .glass-panel {
-  background: #00242aa6;
+  background: #181200;
   backdrop-filter: blur(14px);
   border-radius: 1.5rem;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
@@ -27,7 +27,7 @@
   margin: 1em 0;
 }
 .custom-blue {
-  background-color: #00242aa6;
+  background-color: #181200;
 }
 .glass-panel:hover {
   transform: translateY(-2px);
@@ -129,7 +129,7 @@
 .icon-box svg {
   font-size: 1.8rem;
   margin-bottom: 0.6rem;
-  color: #16c4f9;
+  color: #ddb231;
 }
 
 .icon-box:hover {
@@ -177,7 +177,7 @@
 /* Header styles */
 .form-header {
   font-size: 24px;
-  color: skyblue;
+  color: #e7b82b;
   margin-bottom: 20px;
   text-align: center;
 }
@@ -206,7 +206,7 @@
 .input-field {
   width: 100%;
   padding: 12px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #47350011;
   color: white;
   border-radius: 8px;
   border: none;
@@ -215,12 +215,12 @@
 }
 
 .input-field::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff99;
 }
 
 /* Status message */
 .status-message {
-  color: skyblue;
+  color: #e7b82b;
   text-align: center;
   font-size: 14px;
   margin-top: 10px;
@@ -233,7 +233,7 @@
 }
 
 .pay-btn {
-  background-color: rgb(0, 152, 213);
+  background-color: #e7b82b;
   color: black;
   padding: 12px 20px;
   border-radius: 8px;
@@ -244,20 +244,20 @@
 }
 
 .pay-btn:hover {
-  background-color: #5cb3ff;
+  background-color: #e7b82b;
 }
 
 /* Make Payment button */
 .make-payment-btn {
   font-size: 20px;
-  color: skyblue;
+  color: #e7b82b;
   cursor: pointer;
   margin-bottom: 20px;
   transition: color 0.3s;
 }
 
 .make-payment-btn:hover {
-  color: #5cb3ff;
+  color: #e7b82b;
 }
 .make-payment {
   font-size: 2em;

@@ -1,7 +1,6 @@
 import ClientPage from "@/components/Client";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import ConnectWallet from "@/components/connectWallet";
-
 // This is a publically accessible page, displaying optional contents for signed-in users.
 export default function Index() {
   const account = useCurrentAccount();

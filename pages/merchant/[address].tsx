@@ -124,13 +124,13 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
             <h1 className="text-2xl font-bold">Account Details</h1>
             <button
               onClick={handleGoBack}
-              className="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="py-2 px-4 bg-yellow-600 text-white rounded hover:bg-yellow-700"
             >
               Back to Accounts
             </button>
           </div>
 
-          <div className=" text-white rounded shadow border border-gray-700 p-6">
+          <div className=" text-white rounded shadow border border-black-700 p-6">
             {accountDetails ? (
               <>
                 <MerchantSlug merchantAddress={accountDetails.id} />
@@ -139,11 +139,11 @@ const AccountDetailPage = ({ address }: AccountDetailPageProps) => {
                     {/* <h2 className="text-xl font-semibold mb-2">
                       {accountDetails.name}
                     </h2>
-                    <p className="text-gray-400">
+                    <p className="text-black-400">
                       Account ID: {accountDetails.id}
                     </p> */}
                     {accountDetails.address && (
-                      <p className="text-gray-400">
+                      <p className="text-black-400">
                         {/* Address: {accountDetails.address} */}
                       </p>
                     )}

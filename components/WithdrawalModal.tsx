@@ -334,7 +334,7 @@ export default function WithdrawModal() {
                     key={t}
                     className={`px-4 py-2 rounded-lg flex items-center justify-center flex-1 ${
                       token === t
-                        ? "bg-blue-600"
+                        ? "bg-yellow-600"
                         : "bg-gray-700 hover:bg-gray-600"
                     }`}
                     onClick={() => handleTokenChange(t)}
@@ -354,7 +354,7 @@ export default function WithdrawModal() {
                 type="text"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
-                className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+                className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-yellow-500 focus:outline-none"
                 placeholder="0x..."
               />
             </div>
@@ -378,7 +378,7 @@ export default function WithdrawModal() {
                     setAmount(e.target.value);
                     setMaxSelected(false);
                   }}
-                  className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none pr-16"
+                  className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-yellow-500 focus:outline-none pr-16"
                   placeholder="0.0"
                   step="0.0001"
                 />
@@ -387,7 +387,7 @@ export default function WithdrawModal() {
                   onClick={handleMaxClick}
                   className={`absolute right-2 py-1 px-2 text-xs rounded ${
                     maxSelected
-                      ? "bg-blue-600"
+                      ? "bg-yellow-600"
                       : "bg-gray-600 hover:bg-gray-500"
                   }`}
                 >
@@ -421,7 +421,7 @@ export default function WithdrawModal() {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-900 bg-opacity-30 border border-red-800 text-red-400 p-3 rounded-lg text-sm flex items-center">
+              <div className="bg-yellow-900 bg-opacity-30 border border-yellow-800 text-yellow-400 p-3 rounded-lg text-sm flex items-center">
                 <FaTimes className="mr-2" />
                 {error}
               </div>
@@ -432,7 +432,7 @@ export default function WithdrawModal() {
               <Button
                 onClick={handleWithdraw}
                 disabled={loading}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                className="w-full py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">

@@ -142,18 +142,18 @@ export default function Index() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-sky-400 p-6">
+    <div className="min-h-screen bg-black text-yellow-400 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Merchant Accounts</h1>
-          <p className="text-sky-300 mt-2 md:mt-0">
+          <p className="text-yellow-300 mt-2 md:mt-0">
             Connected: {truncateAddress(user)}
           </p>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-400"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
           </div>
         ) : accounts.length > 0 ? (
           <div className=" rounded-lg border border-gray-800 p-6">
@@ -162,7 +162,7 @@ export default function Index() {
                 Your Payment Accounts
               </h2>
               <Link href="/merchant/create">
-                <span className="px-4 py-2 bg-sky-600 hover:bg-sky-700 transition-colors text-white rounded-lg">
+                <span className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 transition-colors text-white rounded-lg">
                   Create New Account
                 </span>
               </Link>
@@ -175,7 +175,7 @@ export default function Index() {
                   placeholder="Search by name or address..."
                   value={searchQuery}
                   onChange={findAccountByName}
-                  className="w-full px-4 py-2 custom-blue border border-gray-700 rounded-lg text-sky-300 placeholder-gray-500"
+                  className="w-full px-4 py-2 custom-yellow border border-gray-700 rounded-lg text-yellow-300 placeholder-gray-500"
                 />
               </div>
 
@@ -183,7 +183,7 @@ export default function Index() {
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
-                  className="w-full px-4 py-2 custom-blue border border-gray-700 rounded-lg text-sky-300"
+                  className=" sort_option w-full px-4 py-2 custom-yellow border border-gray-700 rounded-lg text-black-300"
                 >
                   <option value="name">Sort by Name</option>
                   <option value="id">Sort by Address</option>
@@ -198,8 +198,8 @@ export default function Index() {
                     key={account.id}
                     className={`flex items-center p-4 border border-gray-700 rounded-lg cursor-pointer transition-colors ${
                       selectedAccountId === account.id
-                        ? "bg-sky-900 border-sky-600"
-                        : "custom-blue hover:bg-gray-700"
+                        ? "bg-yellow-900 border-yellow-600"
+                        : "custom-yellow hover:bg-gray-700"
                     }`}
                   >
                     <input
@@ -208,7 +208,7 @@ export default function Index() {
                       value={account.id}
                       checked={selectedAccountId === account.id}
                       onChange={() => setSelectedAccountId(account.id)}
-                      className="h-5 w-5 text-sky-500"
+                      className="h-5 w-5 text-yellow-500"
                     />
                     <div className="ml-4 flex-1">
                       <h3 className="font-medium text-lg capitalize">
@@ -222,7 +222,7 @@ export default function Index() {
                       <button
                         type="submit"
                         disabled={loading || !selectedAccountId}
-                        className="w-max  p-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:bg-gray-700 disabled:text-gray-400 transition-colors font-medium"
+                        className="w-max  p-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-700 disabled:text-gray-400 transition-colors font-medium"
                       >
                         {loading ? (
                           <span className="flex items-center justify-center">
@@ -250,7 +250,7 @@ export default function Index() {
                 <button
                   type="submit"
                   disabled={loading || !selectedAccountId}
-                  className="w-full py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:bg-gray-700 disabled:text-gray-400 transition-colors font-medium"
+                  className="w-full py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-700 disabled:text-gray-400 transition-colors font-medium"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -269,7 +269,7 @@ export default function Index() {
             <div className="text-5xl mb-4">🚫</div>
             <p className="text-xl mb-6">No payment accounts found.</p>
             <Link href="/merchant/create">
-              <span className="px-6 py-3 bg-sky-600 hover:bg-sky-700 transition-colors text-white rounded-lg font-medium">
+              <span className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 transition-colors text-white rounded-lg font-medium">
                 Create Your First Account
               </span>
             </Link>

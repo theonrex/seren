@@ -19,7 +19,7 @@ export default function ScanModal({ link }: any) {
   return (
     <div>
       <div onClick={openPaymentModal}>
-        <FaQrcode className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
+        <FaQrcode className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-yellow-400" />
         {/* <span className="text-xs sm:text-sm"></span> */}
       </div>
 

@@ -26,14 +26,16 @@
 }
 
 .suiPay img {
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
+  margin-right: 1em;
 }
 
 .suiPay h1 {
   color: white;
   font-weight: 500;
   font-size: 52.91px;
+  margin: 0;
 }
 
 .main a {

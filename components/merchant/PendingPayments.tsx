@@ -12,7 +12,7 @@ export default function PendingPayments({
 }: any) {
   return (
     <div>
-      <div className="bg-gray-900 p-4 sm:p-5 rounded-xl border border-gray-800">
+      <div className="bg-black p-4 sm:p-5 rounded-xl border border-black">
         <div className="flex justify-between items-center mb-3 sm:mb-4">
           <h3 className="text-base sm:text-lg font-semibold">
             Pending Payments
@@ -24,23 +24,23 @@ export default function PendingPayments({
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="animate-pulse bg-gray-800 h-12 sm:h-16 rounded-xl"
+                className="animate-pulse bg-yellow-800 h-12 sm:h-16 rounded-xl"
               ></div>
             ))}
           </div>
         ) : pendingPayments && Object.keys(pendingPayments).length > 0 ? (
-          <div className="space-y-2 sm:space-y-3">
+          <div className="text_white space-y-2 sm:space-y-3">
             {Object.keys(pendingPayments).map((key) => {
               const payment = pendingPayments[key];
               const account = payment.fields?.account;
               const paymentKey = payment.fields?.key;
 
-              const linkToCopy = `https://seren-beta.vercel.app/makepayment?account=${account}&key=${paymentKey}`;
+              const linkToCopy = `https://serenpay.fun/makepayment?account=${account}&key=${paymentKey}`;
 
               return (
                 <div
                   key={key}
-                  className="bg-gray-800 rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors"
+                  className="bg_yellow_dark rounded-xl p-3 sm:p-4 flex justify-between items-center hover:bg-gray-700 transition-colors"
                 >
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="bg-green-900/30 p-1 sm:p-2 rounded-full">

@@ -33,7 +33,7 @@ export default function DepositModal({
         onClick={() => setOpenModal(true)}
         className="bg-gray-900 p-3 sm:p-4 rounded-xl hover:bg-gray-800 transition cursor-pointer border border-gray-800 text-center"
       >
-        <FaArrowDown className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
+        <FaArrowDown className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-yellow-400" />
         <span className="text-xs sm:text-sm">Deposit</span>
       </div>{" "}
     
@@ -67,7 +67,7 @@ export default function DepositModal({
               <button
                 onClick={handleCopy}
                 title="Copy to clipboard"
-                className="text-blue-600 hover:text-blue-800"
+                className="text-yellow-600 hover:text-yellow-800"
               >
                 <FaRegCopy />
               </button>

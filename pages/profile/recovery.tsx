@@ -1,9 +1,10 @@
 import React from "react";
 import SetRecovery from "@/components/Profile/setRecovery";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import ConnectWallet from "@/components/connectWallet";
+
 export default function recovery() {
-  return (
-    <div>
-      <SetRecovery />
-    </div>
-  );
+  const account = useCurrentAccount();
+  const user = account?.address;
+  return <div>{user ? <SetRecovery /> : <ConnectWallet />}</div>;
 }

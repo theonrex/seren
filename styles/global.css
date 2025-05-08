@@ -16,7 +16,7 @@ body {
 body {
   margin: 0;
   height: 100vh;
-  background: linear-gradient(to bottom, #4a90e2 0%, #0e0f11 40%, #0e0f11 100%);
+  background: linear-gradient(to bottom, #3e2c00 0%, #0e0f11 40%, #0e0f11 100%);
   position: relative;
   background-repeat: no-repeat;
 }
@@ -30,12 +30,8 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.15) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-image: linear-gradient(to right, #ffffff26 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff26 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 1;
@@ -101,14 +97,14 @@ label {
 
 .input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #e2b74a;
 }
 
 .submit-btn {
   width: 100%;
   padding: 12px;
   border: none;
-  background-color: #007bff;
+  background-color: #e2b74a;
   color: white;
   font-size: 1.1rem;
   border-radius: 5px;
@@ -122,7 +118,7 @@ label {
 }
 
 .submit-btn:hover:enabled {
-  background-color: #0056b3;
+  background-color: #e2b74a;
 }
 
 .error-message {
@@ -130,3 +126,21 @@ label {
   margin-top: 10px;
   font-size: 1rem;
 }
+
+.sort_options {
+  color: black !important;
+}
+
+.bg_yellow_dark {
+  background-color: rgba(32, 22, 0, 0.126) !important;
+}
+
+.text_white {
+  color: white !important;
+}
+
+.text_white p {
+  color: white;
+}
+
+

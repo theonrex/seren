@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Balance from "../Balance";
 import { FaPaperPlane } from "react-icons/fa";
@@ -10,6 +9,8 @@ import {
   useCurrentAccount,
 } from "@mysten/dapp-kit";
 import { useSuiClient } from "@mysten/dapp-kit";
+import PaymentPage from "@/components/dashboard/payment";
+
 // Target package ID
 const TARGET_PACKAGE_ID =
   "0x841fd25185f32719f2003fe80a34e934b00fd06ae393a96c8043eeddb0c134d9";
@@ -125,6 +126,7 @@ export default function ClientPage() {
 
   return (
     <div className="p-4">
+      <PaymentPage />
       <Balance />
 
       <div className="mt-6">

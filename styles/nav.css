@@ -12,6 +12,10 @@
   background: linear-gradient(135deg, #011113, #070e1b);
 }
 
+.nav_div img {
+  margin-right: 0.5em;
+}
+
 .nav_div .navbar_collapse ul {
   display: flex;
   flex-direction: row;

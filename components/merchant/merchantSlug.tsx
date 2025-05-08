@@ -138,7 +138,7 @@ export default function MerchantSlug({ merchantAddress }: any) {
         if (payment.fields.creator !== user) {
           router.push("/merchant");
         } else {
-          console.log(""); 
+          console.log("");
         }
       }
     };
@@ -171,21 +171,27 @@ export default function MerchantSlug({ merchantAddress }: any) {
   // Copy address to clipboard
   const copyToClipboard = () => {
     if (!merchantAddress) return;
-    navigator.clipboard.writeText(merchantAddress);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard
+      .writeText(merchantAddress)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy:", err);
+      });
   };
   const handleCopy = (key: string) => {
     setCopiedPayment(key);
     setTimeout(() => setCopiedPayment(null), 2000); // Reset after 2 seconds
   };
   return (
-    <div className="min-h-screen  text-sky-400 px-4 py-6 font-sans">
+    <div className="min-h-screen  text-yellow-400 px-4 py-6 font-sans">
       <div className=" mx-auto space-y-6">
         {/* Header with back link */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Link href="/merchant">
-            <span className="flex items-center text-sky-500 hover:text-sky-400 transition-colors">
+            <span className="flex items-center text-yellow-500 hover:text-yellow-400 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 mr-2"
@@ -202,51 +208,51 @@ export default function MerchantSlug({ merchantAddress }: any) {
             </span>
           </Link>
           <div className="text-left sm:text-right w-full sm:w-auto">
-            <span className="text-gray-400 text-sm">Merchant Dashboard</span>
+            <span className="text-yellow text-sm">Merchant Dashboard</span>
           </div>
         </div>
 
         {/* Wallet Address */}
-        <div className="bg-gray-900 rounded-xl p-4 sm:p-5 border border-gray-800">
-          <p className="text-gray-400 text-sm mb-2">Merchant Address</p>
+        <div className="bg-black rounded-xl p-4 sm:p-5 border border-black">
+          <p className="text-yellow text-sm mb-2">Merchant Address</p>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <p className="text-sm sm:text-md font-mono bg-gray-800 p-2 rounded-lg break-all w-full sm:w-auto">
-              <span className="hidden sm:inline">
+            <p className="text-sm sm:text-md font-mono bg-black p-2 rounded-lg break-all w-full sm:w-auto">
+              <span className=" text_white sm:inline">
                 {merchantAddress
                   ? truncateAddress(merchantAddress)
                   : "Not available"}
               </span>
-              <span className="inline sm:hidden">
+              {/* <span className="inline sm:hidden">
                 {merchantAddress
                   ? truncateAddress(merchantAddress, true)
                   : "Not available"}
-              </span>
+              </span> */}
             </p>
-            <button
+            {/* <button
               onClick={copyToClipboard}
-              className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+              className="p-2 bg-black rounded-lg hover:bg-black transition-colors flex items-center gap-2"
               title="Copy address"
             >
-              <FaCopy className="text-sky-400" />
+              <FaCopy className="text-yellow-400" />
               <span className="sm:hidden">{copied ? "Copied!" : "Copy"}</span>
               {copied && (
                 <span className="hidden sm:inline text-green-400 text-sm">
                   Copied!
                 </span>
               )}
-            </button>
+            </button> */}
           </div>
         </div>
 
         {/* Balance Card */}
-        <div className="bg-gray-900 rounded-xl p-4 sm:p-6 border border-gray-800 shadow-lg">
-          <p className="text-gray-400 text-sm mb-1">Total Balance</p>
+        <div className="bg-black rounded-xl p-4 sm:p-6 border border-black shadow-lg">
+          <p className="text-yellow text-sm mb-1">Total Balance</p>
           {isLoading ? (
             <div className="h-10 flex items-center">
-              <div className="animate-pulse bg-gray-800 rounded h-8 w-32"></div>
+              <div className="animate-pulse bg-black rounded h-8 w-32"></div>
             </div>
           ) : (
-            <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 text-transparent bg-clip-text">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white  bg-clip-text">
               {balance !== null ? `${balance} SUI` : "No balance"}
             </h2>
           )}
@@ -258,16 +264,16 @@ export default function MerchantSlug({ merchantAddress }: any) {
 
         {/* Action Buttons */}
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
-          <div className="bg-gray-900 p-3 sm:p-4 rounded-xl hover:bg-gray-800 transition cursor-pointer border border-gray-800 text-center">
-            <FaHistory className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
-            <span className="text-xs sm:text-sm">History</span>
+          <div className="bg-black p-3 sm:p-4 rounded-xl hover:bg-black transition cursor-pointer border border-black text-center">
+            <FaHistory className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-yellow-400" />
+            <span className="  text_white text-xs sm:text-sm">History</span>
           </div>{" "}
-          <div className="bg-gray-900 p-3 sm:p-4 rounded-xl hover:bg-gray-800 transition cursor-pointer border border-gray-800 text-center">
+          <div className="bg-black p-3 sm:p-4 rounded-xl hover:bg-black transition cursor-pointer border border-black text-center">
             <IssuePaymentModal merchantAddress={merchantAddress} />
           </div>
-          <div className="bg-gray-900 p-3 sm:p-4 rounded-xl hover:bg-gray-800 transition cursor-pointer border border-gray-800 text-center">
-            <FaMoneyBillWave className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-sky-400" />
-            <span className="text-xs sm:text-sm">Earn</span>
+          <div className="bg-black p-3 sm:p-4 rounded-xl hover:bg-black transition cursor-pointer border border-black text-center">
+            <FaMoneyBillWave className="text-lg sm:text-2xl mx-auto mb-1 sm:mb-2 text-yellow-400" />
+            <span className=" text_white text-xs sm:text-sm">Earn</span>
           </div>
         </div>
 
