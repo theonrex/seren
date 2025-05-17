@@ -21,7 +21,7 @@ export default function Layout({ children }: LayoutProps) {
         />
         <link
           rel="icon"
-          href="https://ipfs.io/ipfs/bafkreiczsfcf5n4asilwg3ne6x2ko6setwnarjhyndwhdbfafafaiwpjbq"
+          href="https://ipfs.io/ipfs/bafkreicdmvv6aaqqoeigpr2gpu6c625jnjbd6ny2zjurgcyv65lv6bljxm"
         />
         <ThemeModeScript />
         <link
