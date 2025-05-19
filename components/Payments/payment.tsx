@@ -174,7 +174,7 @@ export default function Payment() {
             />
           </div>
           <div className="input-group">
-            <label className="input-label">Tip (in MIST)</label>
+            <label className="input-label">Tip Merchanet</label>
             <input
               type="number"
               value={tip}

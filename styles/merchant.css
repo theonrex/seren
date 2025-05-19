@@ -68,7 +68,7 @@ a:hover {
 }
 
 .OpenModal button {
-  background-color: #0288d1;
+  background-color: #d18c02;
   border-radius: 0.5em;
   padding: 1em 3em;
 }
@@ -88,23 +88,35 @@ a:hover {
   margin-top: 20px;
 }
 
-.card input {
+.card div input {
   width: 100%;
   padding: 10px;
-  background: #000b0ea6;
+  background: #000000a6;
   border: 1px solid #444;
   border-radius: 8px;
-  color: skyblue;
+  color: #e7b82b !important;
   font-size: 1rem;
+}
+
+.card div input {
+  outline: none;
+  border-style: none !important;
+}
+
+.card div input:focus,
+.card div input:active {
+  outline: none !important;
+  border: white !important;
+  border-width: 22px !important;
 }
 
 .card input:focus {
   outline: none;
-  border-color: #00bcd4;
+  border-color: #e7b82b;
 }
 
 .card button {
-  background-color: #00bcd4;
+  background-color: #e7b82b;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -114,7 +126,7 @@ a:hover {
 }
 
 .card button:hover {
-  background-color: #0288d1;
+  background-color: #d18c02;
 }
 
 /* Responsive */

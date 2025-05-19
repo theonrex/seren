@@ -103,10 +103,12 @@ export default function WalletOverview() {
           </div> */}
 
           <WithdrawModal />
-          <div className="glass-panel icon-box">
+          <Link className="glass-panel icon-box" href="/merchant">
+            {" "}
             <FaMoneyBillWave />
-            <span>Earn</span>
-          </div>
+            <span>Create Payment</span>
+          </Link>
+         
           <DepositModal copyAddress={account.address} />
         </div>
       </div>

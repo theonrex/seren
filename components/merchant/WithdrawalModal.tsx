@@ -196,16 +196,17 @@ export default function WithdrawModal({ merchantAddress }: any) {
                   },
                 });
 
-                const txStatus = transactionBlock.effects?.status?.status;
+                const txStatus = transactionBlock.digest;
 
-                if (txStatus !== "success") {
+                if (txStatus) {
                   setError(`Transaction failed: ${txStatus}`);
                   toast.error(`Transaction failed: ${txStatus}`);
                   setLoading(false);
-                } else {
+                } else if (error) {
                   setSuccess(true);
                   toast.success(`${token} transfer successful!`);
                   setLoading(false);
+                  setOpenModal(false);
 
                   // Refresh balances after successful transaction
                   const fetchBalances = async () => {
@@ -432,7 +433,7 @@ export default function WithdrawModal({ merchantAddress }: any) {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <Spinner size="sm" className="mr-2" />
+                    {/* <Spinner size="sm" className="mr-2" /> */}
                     Processing...
                   </div>
                 ) : (

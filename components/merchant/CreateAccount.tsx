@@ -94,11 +94,21 @@ export default function CreateAccount() {
                 dataToStore.profilePicture = uploadedImageUrl;
               }
 
+              // console.log("dataToStore", dataToStore);
+
               await addDoc(collection(db, "paymentAccounts"), dataToStore);
               // Reset input fields
               setShopName("");
               setUsername("");
               setProfilePicture("");
+
+              // Show "Redirecting..." toast
+              toast.success("Redirecting to merchant...");
+
+              // Wait 10 seconds and redirect
+              setTimeout(() => {
+                window.location.href = "/merchant"; // Replace with your merchant URL or route
+              }, 5000);
             } catch (err) {
               console.error("Error storing data in Firestore:", err);
             }
@@ -137,9 +147,9 @@ export default function CreateAccount() {
         <div className="card-content">
           <h2 className="text-xl font-bold mb-4">Create Payment Request</h2>
 
-          <div className="mb-4">
+          <div className="mb-8">
             <label htmlFor="shopName" className="block mb-2 font-medium">
-              Shop Name
+              Account Name
             </label>
             <input
               type="text"
@@ -150,7 +160,7 @@ export default function CreateAccount() {
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-8">
             <label htmlFor="username" className="block mb-2 font-medium">
               Username
             </label>
@@ -162,7 +172,7 @@ export default function CreateAccount() {
             />
           </div>
 
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label htmlFor="profilePicture" className="block mb-2 font-medium">
               Profile Picture URL
             </label>
@@ -172,7 +182,7 @@ export default function CreateAccount() {
               value={profilePicture}
               onChange={(e) => setProfilePicture(e.target.value)}
             />
-          </div>
+          </div> */}
 
           <div className="flex justify-between mt-4">
             <button onClick={handleSubmit} disabled={isLoading}>
