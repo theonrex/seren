@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from "flowbite-react";
+import { Button } from "flowbite-react";
 import {
   useSignAndExecuteTransaction,
   useCurrentAccount,
 } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { PaymentClient } from "../../payment/src/payment-client";
-import { ACCOUNT, NETWORK, testKeypair } from "../../payment/test/ptbs/utils";
+import { ACCOUNT, testKeypair } from "../../payment/test/ptbs/utils";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { toast } from "react-toastify"; // Make sure toast is installed and imported
+const NETWORK = "testnet"; // or "mainnet" / "devnet"
+import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
 export default function Payment() {
   const [openModal, setOpenModal] = useState(false);
@@ -24,11 +20,14 @@ export default function Payment() {
   const [status, setStatus] = useState<string | null>(null);
   const [url, setUrl] = useState(""); // New state for storing the pasted URL
   const [loading, setLoading] = useState(false); // Loading state to disable button
-  const suiClient = useSuiClient();
-
+  const suiClient = useSuiClient() as any;
   const account = useCurrentAccount();
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction();
+  const client = new SuiClient({ url: getFullnodeUrl(NETWORK) });
+
+  console.log("account,", account?.address);
+  console.log("data,", merchantAccount);
 
   // Function to extract merchantaccount and paymentId from the URL
   const handleUrlChange = (e: any) => {
@@ -98,8 +97,9 @@ export default function Payment() {
 
       // Pass the suiClient to the toJSON method
       // const txnBytes = await tx.build({ client: suiClient });
-      const txnJSON = await tx.toJSON();
+      await tx.build({ client: suiClient });
 
+      const txnJSON = await tx.toJSON();
       const result = await signAndExecuteTransaction({
         transaction: txnJSON,
         chain: "sui:testnet", // or "sui:mainnet"
